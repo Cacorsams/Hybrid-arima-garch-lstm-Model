@@ -1,0 +1,8 @@
+{
+    "source_directories": [
+        "."
+    ],
+    "search_path": [
+        "/home/seth/Projects/school projects/python-backend/venv/lib/python3.12/site-packages"
+    ]
+}

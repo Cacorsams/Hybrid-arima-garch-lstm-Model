@@ -1,0 +1,9 @@
+{
+  "source_directories": ["."],
+  "exclude": [
+    ".*/python-backend/.*"
+  ],
+  "ignore_all_errors": [
+    "python-backend"
+  ]
+}
