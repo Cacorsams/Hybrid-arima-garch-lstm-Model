@@ -31,23 +31,26 @@ class ForexDataCollector:
         return self.fetch_from_alpha_vantage(from_symbol, to_symbol)
 
     def fetch_from_supabase(self):
-        """Fetch historical rates from Supabase table"""
+        """Fetch historical rates from Supabase table, ensuring latest records and correct order"""
         try:
-            response = supabase.table("exchange_rates").select("*").order("date").execute()
+            # Fetch latest 4000 records (descending date)
+            response = supabase.table("exchange_rates").select("*").order("date", desc=True).limit(4000).execute()
             records = response.data
             
             if not records:
                 print("⚠ No records found in Supabase, falling back to Alpha Vantage...")
                 return self.fetch_from_alpha_vantage()
                 
+            # Create DataFrame and sort chronologically (ascending)
             self.fx_data = pd.DataFrame(records)
             self.fx_data['date'] = pd.to_datetime(self.fx_data['date'])
+            self.fx_data = self.fx_data.sort_values('date', ascending=True).reset_index(drop=True)
             
             # Ensure log returns are present
             if 'log_return' not in self.fx_data.columns or self.fx_data['log_return'].isnull().all():
                 self.fx_data['log_return'] = np.log(self.fx_data['close'] / self.fx_data['close'].shift(1))
             
-            print(f"✓ Fetched {len(self.fx_data)} records from Supabase")
+            print(f"✓ Fetched {len(self.fx_data)} records from Supabase (Ascending order)")
             return self.fx_data
         except Exception as e:
             print(f"✗ Error fetching from Supabase: {e}")

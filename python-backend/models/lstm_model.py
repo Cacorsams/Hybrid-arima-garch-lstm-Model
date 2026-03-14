@@ -11,7 +11,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 class LSTMPredictor:
     """LSTM network for non-linear pattern learning"""
     
-    def __init__(self, lookback=60, units=50, dropout=0.2):
+    def __init__(self, lookback=30, units=100, dropout=0.2):
         self.lookback = lookback
         self.units = units
         self.dropout = dropout

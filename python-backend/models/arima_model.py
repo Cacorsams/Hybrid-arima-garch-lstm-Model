@@ -23,9 +23,9 @@ class ARIMAForecaster:
         print("Finding optimal ARIMA order...")
         auto_model = auto_arima(
             series,
-            max_p=3,
+            max_p=5,
             max_d=1,
-            max_q=3,
+            max_q=5,
             seasonal=False,
             stepwise=True,
             information_criterion='aic',
