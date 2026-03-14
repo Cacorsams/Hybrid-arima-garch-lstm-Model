@@ -15,7 +15,7 @@ interface HeaderProps {
 export default function Header({ activePage }: HeaderProps) {
   const router = useRouter();
   const supabase = createClient();
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -37,7 +37,11 @@ export default function Header({ activePage }: HeaderProps) {
           user.user_metadata?.full_name ||
           user.email?.split('@')[0] ||
           'User';
-        setUser({ name, email: user.email ?? '' });
+        setUser({ 
+          name, 
+          email: user.email ?? '', 
+          role: user.user_metadata?.role 
+        });
       }
     }
     loadUser();
@@ -132,7 +136,10 @@ export default function Header({ activePage }: HeaderProps) {
                   {/* Email only - per user request */}
                   <div className="px-5 py-4 border-b border-border">
                     <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground mb-1">Signed in as</p>
-                    <p className="text-sm font-bold text-foreground truncate">{user.email}</p>
+                    <p className="text-sm font-bold text-foreground truncate mb-1">{user.email}</p>
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent text-[8px] font-black uppercase tracking-tighter text-muted-foreground border border-border">
+                      {user.email === 'cacorsams@gmail.com' ? 'System Administrator' : (user.role || 'Basic User')}
+                    </div>
                   </div>
 
                   <div className="py-1">

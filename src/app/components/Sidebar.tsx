@@ -161,13 +161,16 @@ export default function Sidebar() {
              )}
           </div>
 
-          {/* Footer Card */}
+          {/* Footer Status */}
           {!isCollapsed && (
-            <div className="mt-auto p-4 bg-card rounded-2xl border border-border shadow-sm">
-                <p className="text-[10px] font-bold text-primary uppercase mb-1">Status</p>
-                <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-xs font-semibold text-foreground">Pipeline Active</span>
+            <div className="mt-auto -mx-4">
+                <div className="h-[1px] w-full bg-border mb-4" />
+                <div className="px-6 flex items-center justify-between pb-2">
+                    <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-tight">Status</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-foreground">Pipeline active</span>
+                    </div>
                 </div>
             </div>
           )}
