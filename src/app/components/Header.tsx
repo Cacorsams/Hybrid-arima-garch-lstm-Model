@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
 import { useTheme } from 'next-themes';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Check } from 'lucide-react';
+import { useColorTheme } from './ColorThemeProvider';
 
 interface HeaderProps {
   activePage?: 'home' | 'about' | 'dashboard';
@@ -21,6 +22,7 @@ export default function Header({ activePage }: HeaderProps) {
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const { colorTheme, setColorTheme } = useColorTheme();
 
   // Avoid hydration mismatch by waiting for mount
   useEffect(() => {
@@ -159,7 +161,36 @@ export default function Header({ activePage }: HeaderProps) {
                       Dashboard
                     </Link>
 
-                    {/* Theme Toggle */}
+                    {/* Color Theme Selector */}
+                    {mounted && (
+                      <div className="px-5 py-3 border-b border-border">
+                        <p className="text-[10px] uppercase font-bold text-muted-foreground mb-3">Color Theme</p>
+                        <div className="flex items-center gap-3">
+                          {([
+                            { id: 'teal', color: 'bg-teal-500' },
+                            { id: 'mustard', color: 'bg-[#eab308]' }, // approx mustard-500
+                            { id: 'green', color: 'bg-green-500' },
+                            { id: 'magenta', color: 'bg-[#d946ef]' } // approx fuchsia/magenta-500
+                          ] as const).map((t) => (
+                            <button
+                              key={t.id}
+                              onClick={() => {
+                                setColorTheme(t.id);
+                                setDropdownOpen(false);
+                              }}
+                              className={`relative w-6 h-6 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${
+                                colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
+                              }`}
+                              aria-label={`Set theme to ${t.id}`}
+                            >
+                              {colorTheme === t.id && <Check size={12} className="text-white drop-shadow-sm" />}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dark/Light Mode Toggle */}
                     {mounted && (
                       <button
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -236,6 +267,34 @@ export default function Header({ activePage }: HeaderProps) {
             <Link href="/" className="block py-3 text-base text-[#555] dark:text-gray-400">Home</Link>
             <Link href="/models" className="block py-3 text-base text-[#555] dark:text-gray-400">About</Link>
             <Link href="/system/dashboard" className="block py-3 text-base text-[#555] dark:text-gray-400">Dashboard</Link>
+            
+            {mounted && (
+              <div className="py-4 border-b border-border">
+                <p className="text-xs font-bold text-[#888] dark:text-gray-500 uppercase tracking-widest mb-4">Color Theme</p>
+                <div className="flex items-center gap-4">
+                  {([
+                    { id: 'teal', color: 'bg-teal-500' },
+                    { id: 'mustard', color: 'bg-[#eab308]' },
+                    { id: 'green', color: 'bg-green-500' },
+                    { id: 'magenta', color: 'bg-[#d946ef]' }
+                  ] as const).map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setColorTheme(t.id);
+                        setMobileOpen(false);
+                      }}
+                      className={`relative w-8 h-8 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${
+                        colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
+                      }`}
+                      aria-label={`Set theme to ${t.id}`}
+                    >
+                      {colorTheme === t.id && <Check size={16} className="text-white drop-shadow-sm" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {mounted && (
               <button

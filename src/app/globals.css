@@ -87,6 +87,42 @@
   --color-teal-700: oklch(0.51 0.13 192.1);
   --color-teal-800: oklch(0.42 0.11 195.2);
   --color-teal-900: oklch(0.35 0.09 198.3);
+
+  /* Explicit Mustard Colors for Theme Resolution */
+  --color-mustard-50: oklch(0.984 0.014 80.72);
+  --color-mustard-100: oklch(0.953 0.051 80.89);
+  --color-mustard-200: oklch(0.91 0.096 80.46);
+  --color-mustard-300: oklch(0.846 0.128 81.01);
+  --color-mustard-400: oklch(0.74 0.15 83.18);
+  --color-mustard-500: oklch(0.662 0.16 86.63);
+  --color-mustard-600: oklch(0.584 0.158 89.06);
+  --color-mustard-700: oklch(0.51 0.13 92.1);
+  --color-mustard-800: oklch(0.42 0.11 95.2);
+  --color-mustard-900: oklch(0.35 0.09 98.3);
+
+  /* Explicit Green Colors for Theme Resolution */
+  --color-green-50: oklch(0.984 0.014 140.72);
+  --color-green-100: oklch(0.953 0.051 140.89);
+  --color-green-200: oklch(0.91 0.096 140.46);
+  --color-green-300: oklch(0.846 0.128 141.01);
+  --color-green-400: oklch(0.74 0.15 143.18);
+  --color-green-500: oklch(0.662 0.16 146.63);
+  --color-green-600: oklch(0.584 0.158 149.06);
+  --color-green-700: oklch(0.51 0.13 152.1);
+  --color-green-800: oklch(0.42 0.11 155.2);
+  --color-green-900: oklch(0.35 0.09 158.3);
+
+  /* Explicit Magenta Colors for Theme Resolution */
+  --color-magenta-50: oklch(0.984 0.014 330.72);
+  --color-magenta-100: oklch(0.953 0.051 330.89);
+  --color-magenta-200: oklch(0.91 0.096 330.46);
+  --color-magenta-300: oklch(0.846 0.128 331.01);
+  --color-magenta-400: oklch(0.74 0.15 333.18);
+  --color-magenta-500: oklch(0.662 0.16 336.63);
+  --color-magenta-600: oklch(0.584 0.158 339.06);
+  --color-magenta-700: oklch(0.51 0.13 342.1);
+  --color-magenta-800: oklch(0.42 0.11 345.2);
+  --color-magenta-900: oklch(0.35 0.09 348.3);
 }
 
 .dark {
@@ -181,6 +217,39 @@ body {
   @variant dark {
     --primary: var(--color-teal-500);
     --primary-foreground: var(--color-teal-50);
+  }
+}
+
+.theme-mustard,
+.theme-mustard-scaled {
+  --primary: var(--color-mustard-600);
+  --primary-foreground: var(--color-mustard-50);
+
+  @variant dark {
+    --primary: var(--color-mustard-500);
+    --primary-foreground: var(--color-mustard-50);
+  }
+}
+
+.theme-green,
+.theme-green-scaled {
+  --primary: var(--color-green-600);
+  --primary-foreground: var(--color-green-50);
+
+  @variant dark {
+    --primary: var(--color-green-500);
+    --primary-foreground: var(--color-green-50);
+  }
+}
+
+.theme-magenta,
+.theme-magenta-scaled {
+  --primary: var(--color-magenta-600);
+  --primary-foreground: var(--color-magenta-50);
+
+  @variant dark {
+    --primary: var(--color-magenta-500);
+    --primary-foreground: var(--color-magenta-50);
   }
 }
 
