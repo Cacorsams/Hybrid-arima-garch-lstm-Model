@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
 import { useTheme } from 'next-themes';
-import { Sun, Moon, Check } from 'lucide-react';
+import { Sun, Moon, Check, Users } from 'lucide-react';
 import { useColorTheme } from './ColorThemeProvider';
 
 interface HeaderProps {
@@ -195,7 +195,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
                       >
-                        <img src="/graphicons/3137784.png" className="w-[15px] h-[15px] object-contain opacity-70" alt="Admin" />
+                        <Users size={15} className="opacity-70" />
                         User Management
                       </Link>
                     )}

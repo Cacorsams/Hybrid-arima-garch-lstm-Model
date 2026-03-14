@@ -51,7 +51,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
     }
   ];
 
-  const NavLink = ({ item, collapsed }: { item: any, collapsed: boolean }) => {
+  const NavLink = ({ item, collapsed, noGlow }: { item: any, collapsed: boolean, noGlow?: boolean }) => {
     const isActive = pathname === item.href;
     const isImagePath = typeof item.icon === 'string';
 
@@ -59,7 +59,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
       <Link
         href={item.href}
         className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${isActive
-            ? 'bg-primary text-primary-foreground shadow-lg shadow-black/10 dark:shadow-white/5'
+            ? `bg-primary text-primary-foreground ${noGlow ? '' : 'shadow-lg shadow-black/10 dark:shadow-white/5'}`
             : 'text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 dark:hover:text-foreground'
           }`}
       >
@@ -98,10 +98,10 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:sticky top-0 left-0 h-screen z-[55] bg-background border-r border-border dark:border-border transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-72'
+      <aside className={`fixed lg:sticky top-0 left-0 h-screen z-[55] bg-background border-r border-border dark:border-border transition-all duration-300 ease-in-out overflow-x-hidden ${isCollapsed ? 'w-20' : 'w-72'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
 
-        <div className="flex flex-col h-full p-4">
+        <div className="flex flex-col h-full p-4 overflow-x-hidden">
           {/* Logo / Brand */}
           <div className="flex items-center justify-between mb-8 px-2">
             {!isCollapsed && (
@@ -118,8 +118,26 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
           </div>
 
           {/* Navigation Items */}
-          <div className="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-            {!isCollapsed && <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-3 mb-3">Analysis</p>}
+          <div className="flex-1 space-y-1 overflow-y-auto overflow-x-hidden no-scrollbar">
+            <div className="-mx-4">
+              <div className="h-[1px] w-full bg-border mb-4" />
+            </div>
+            
+            <NavLink
+              item={{
+                label: 'Dashboard',
+                href: '/system/Dashboard',
+                icon: LayoutDashboard
+              }}
+              collapsed={isCollapsed}
+              noGlow={true}
+            />
+
+            <div className="-mx-4">
+              <div className="h-[1px] w-full bg-border my-4" />
+            </div>
+
+            {!isCollapsed && <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 tracking-widest px-3 mb-3">Analysis</p>}
             {navItems.map((item) => (
               <NavLink key={item.href} item={item} collapsed={isCollapsed} />
             ))}
