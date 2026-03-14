@@ -36,25 +36,25 @@ export default function Sidebar() {
     { 
       label: 'Hybrid Model', 
       href: '/system/dashboard', 
-      icon: LayoutDashboard,
+      icon: '/graphicons/9163005.png',
       description: 'ARIMA-GARCH-LSTM'
     },
     { 
-      label: 'Standalone ARIMA', 
+      label: 'ARIMA', 
       href: '/system/arima', 
-      icon: LineChart,
+      icon: '/graphicons/18498688.png',
       description: 'Linear Trends'
     },
     { 
-      label: 'Standalone GARCH', 
+      label: 'GARCH', 
       href: '/system/garch', 
-      icon: Activity,
+      icon: '/graphicons/10504075.png',
       description: 'Volatility Clusters'
     },
     { 
-      label: 'Standalone LSTM', 
+      label: 'LSTM', 
       href: '/system/lstm', 
-      icon: BrainCircuit,
+      icon: '/graphicons/12305596.png',
       description: 'Non-linear Patterns'
     }
   ];
@@ -63,13 +63,13 @@ export default function Sidebar() {
     {
       label: 'User Management',
       href: '/system/admin/users',
-      icon: Users
+      icon: '/graphicons/3137784.png' // Using a generic graph icon for now as no user icon exists
     }
   ];
 
   const NavLink = ({ item, collapsed }: { item: any, collapsed: boolean }) => {
     const isActive = pathname === item.href;
-    const Icon = item.icon;
+    const isImagePath = typeof item.icon === 'string';
 
     return (
       <Link
@@ -80,7 +80,17 @@ export default function Sidebar() {
             : 'text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 dark:hover:text-foreground'
         }`}
       >
-        <Icon size={20} className={`shrink-0 ${isActive ? 'scale-110' : 'group-hover:scale-110'} transition-transform`} />
+        {isImagePath ? (
+          <img 
+            src={item.icon} 
+            alt={item.label} 
+            className={`w-5 h-5 object-contain shrink-0 transition-transform ${
+              isActive ? 'scale-110' : 'group-hover:scale-110'
+            } ${isActive ? 'brightness-0 invert' : ''}`} 
+          />
+        ) : (
+          <item.icon size={20} className={`shrink-0 ${isActive ? 'scale-110' : 'group-hover:scale-110'} transition-transform`} />
+        )}
         {!collapsed && (
           <div className="flex flex-col min-w-0">
             <span className="text-sm font-bold truncate">{item.label}</span>
