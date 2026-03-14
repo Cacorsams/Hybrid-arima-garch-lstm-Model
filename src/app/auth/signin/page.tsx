@@ -68,8 +68,10 @@ function SigninForm() {
         <div className="flex-1 p-8 md:p-12 flex flex-col relative z-10">
 
           {/* Logo */}
-          <div className="inline-flex items-center justify-center border border-gray-300 dark:border-gray-700 rounded-full px-5 py-1.5 w-max">
-            <span className="text-gray-700 dark:text-gray-300 text-sm font-medium">QuantForecast</span>
+          <div className="flex items-center mb-8 px-2">
+            <span className="text-xl font-black tracking-tighter text-[#1a1a1a] dark:text-white font-serif">
+              QUANT<span className="text-primary hover:text-primary-foreground transition-colors">F</span>
+            </span>
           </div>
 
           {/* Header */}
@@ -183,74 +185,28 @@ function SigninForm() {
         {/* ── Right Panel ─────────────────────────────────────── */}
         <div className="hidden md:block flex-[1.2] relative rounded-[2rem] overflow-hidden">
           <img
-            src="https://cdn.magicpatterns.com/uploads/crJp8ubCqNAnyPfoM9r1v7/login_page.webp"
-            alt="Team working"
+            src="https://img.freepik.com/premium-ai-image/dark-grainy-background-green-teal-blue-brown-yellow-ar-23-v-52-job-id-2d8578b9200e411d9c8d171812a269b7_125964-1601.jpg"
+            alt="Abstract background"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/10" />
 
-          <button className="absolute top-6 right-6 bg-white rounded-full p-2.5 shadow-md hover:bg-gray-50 transition-colors z-20">
+          <button 
+            type="button"
+            onClick={() => router.back()}
+            className="absolute top-6 right-6 bg-white rounded-full p-2.5 shadow-md hover:bg-gray-50 transition-colors z-20"
+          >
             <X size={18} className="text-gray-600" />
           </button>
 
-          {/* Yellow card */}
-          <div className="absolute top-12 left-12 bg-[#F5C842] rounded-2xl p-4 shadow-lg w-[220px] z-20">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 leading-tight">Task Review With Team</h3>
-                <p className="text-[11px] text-gray-800 mt-1">09:30am – 10:00am</p>
-              </div>
-              <div className="w-1.5 h-1.5 rounded-full bg-gray-900 mt-1" />
-            </div>
-          </div>
-
-          {/* Dark badge */}
-          <div className="absolute top-[100px] left-20 bg-[#2A2A2A] rounded-xl px-4 py-2.5 shadow-lg z-10">
-            <p className="text-[11px] text-gray-300">09:30am – 10:00am</p>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#F5C842]" />
-          </div>
-
-          {/* Calendar */}
-          <div className="absolute bottom-36 left-1/2 -translate-x-1/2 w-[85%] max-w-[360px] bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-5 shadow-xl z-20 overflow-hidden">
-            <div className="absolute right-0 bottom-0 w-1/2 h-full opacity-30"
-              style={{ backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(255,255,255,.8) 4px,rgba(255,255,255,.8) 5px)' }} />
-            <div className="relative z-10">
-              <div className="flex justify-between text-white/90 text-[11px] font-medium mb-3">
-                {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=><span key={d}>{d}</span>)}
-              </div>
-              <div className="flex justify-between text-white text-sm font-medium">
-                {[22,23,24,25,26,27,28].map(d=><span key={d}>{d}</span>)}
-              </div>
-            </div>
-          </div>
-
-          {/* Daily Meeting */}
-          <div className="absolute bottom-10 left-12 bg-white rounded-2xl p-4 shadow-xl w-[200px] z-30">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h3 className="text-[13px] font-semibold text-gray-900">Daily Meeting</h3>
-                <p className="text-[11px] text-gray-500 mt-0.5">12:00pm – 01:00pm</p>
-              </div>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#F5C842] mt-1" />
-            </div>
-            <div className="flex -space-x-2">
-              {[1,2,3,4].map(i=>(
-                <div key={i} className="w-6 h-6 rounded-full border-2 border-white overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?img=${i}`} alt="avatar" className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Avatars */}
-          <div className="absolute right-16 top-[40%] flex flex-col items-center z-20">
-            {[5,9,10].map((img,i)=>(
-              <div key={img} className={`rounded-full border-2 border-white shadow-lg overflow-hidden ${
-                i===0?'w-12 h-12 relative -left-4':i===1?'w-10 h-10 relative -top-2 left-6':'w-11 h-11 relative -top-4 -left-2'
-              }`}>
-                <img src={`https://i.pravatar.cc/150?img=${img}`} alt="avatar" className="w-full h-full object-cover" />
-              </div>
-            ))}
+          {/* Text Overlay */}
+          <div className="absolute bottom-16 left-12 z-20 max-w-md pr-8">
+            <h2 className="text-[40px] leading-[1.1] font-bold text-white tracking-tight mb-3 drop-shadow-md">
+              Bring your ideas to life.
+            </h2>
+            <p className="text-lg text-white/90 drop-shadow-sm font-medium">
+              Predict currency movements with our advanced hybrid models.
+            </p>
           </div>
         </div>
       </div>

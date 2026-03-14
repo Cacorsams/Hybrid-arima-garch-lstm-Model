@@ -38,12 +38,12 @@ export default function ForecastChart({ data }: ForecastChartProps) {
     }
 
     const isDark = theme === 'dark';
-    const gridColor = isDark ? '#333' : '#e0dbd5';
-    const axisColor = isDark ? '#666' : '#888';
-    const tickColor = isDark ? '#aaa' : '#555';
-    const mainColor = isDark ? '#fff' : '#1a1a1a';
-    const tooltipBg = isDark ? '#1e1e1e' : '#fff';
-    const tooltipBorder = isDark ? '#333' : '#e0dbd5';
+    const gridColor = 'var(--border)';
+    const axisColor = 'var(--muted-foreground)';
+    const tickColor = 'var(--muted-foreground)';
+    const mainColor = 'var(--foreground)';
+    const tooltipBg = 'var(--card)';
+    const tooltipBorder = 'var(--border)';
     
     // Brush styling
     const brushStroke = isDark ? '#444' : '#e0dbd5';
@@ -142,7 +142,7 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         dataKey={(d) => [d.confLower, d.confUpper]}
                         name="95% Confidence"
                         stroke="none"
-                        fill="#d94040"
+                        fill="var(--primary)"
                         fillOpacity={0.1}
                         connectNulls
                     />
@@ -163,11 +163,11 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         type="monotone"
                         dataKey="forecast"
                         name="Hybrid Prediction"
-                        stroke="#d94040"
+                        stroke="var(--primary)"
                         strokeWidth={3}
                         strokeDasharray="6 6"
                         dot={false}
-                        activeDot={{ r: 5, strokeWidth: 0, fill: '#d94040' }}
+                        activeDot={{ r: 5, strokeWidth: 0, fill: "var(--primary)" }}
                         connectNulls
                     />
 

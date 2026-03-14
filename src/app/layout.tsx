@@ -25,7 +25,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={`${inter.variable} ${dmSerif.variable}`} suppressHydrationWarning>
+        <html lang="en" className={`${inter.variable} ${dmSerif.variable} theme-scaled theme-teal-scaled`} suppressHydrationWarning>
             <body className="antialiased dark:bg-[#121212] dark:text-white transition-colors duration-200">
                 <ThemeProvider>
                     {children}

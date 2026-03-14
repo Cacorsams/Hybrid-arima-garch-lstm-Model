@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Clock, Users, RefreshCw } from 'lucide-react';
-import Header from '../../../components/Header';
 
 type Profile = {
   id: string;
@@ -83,7 +82,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F4F0] dark:bg-[#121212] font-sans transition-colors duration-200">
+    <div className="space-y-8 animate-in fade-in duration-700">
       {/* Toast */}
       {toast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-5 py-2.5 rounded-full shadow-lg">
@@ -91,12 +90,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* Header */}
-      <Header />
-
-
-      <main className="max-w-6xl mx-auto px-6 py-10">
-
+      <div>
         {/* Page title & Refresh button */}
         <div className="mb-8 flex items-end justify-between">
           <div>
@@ -240,7 +234,7 @@ export default function AdminUsersPage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
