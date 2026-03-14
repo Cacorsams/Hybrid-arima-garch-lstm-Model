@@ -178,10 +178,17 @@ class HybridARIMAGARCHLSTM:
         # 4. Hybrid Evaluation
         # Hybrid pred = ARIMA + (LSTM * GARCH_vol)
         hybrid_preds = arima_preds + (np.array(lstm_all_preds) * garch_vol)
+        
+        # Safe MAPE calculation
+        test_returns_safe = np.where(test_returns == 0, 1e-8, test_returns)
+        mape = np.mean(np.abs((test_returns - hybrid_preds) / test_returns_safe)) * 100
+        if not np.isfinite(mape):
+            mape = 0.0
+            
         hybrid_metrics = {
             'mae': float(mean_absolute_error(test_returns, hybrid_preds)),
             'rmse': float(np.sqrt(mean_squared_error(test_returns, hybrid_preds))),
-            'mape': float(np.mean(np.abs((test_returns - hybrid_preds) / (test_returns + 1e-8))) * 100)
+            'mape': float(mape)
         }
         
         return {

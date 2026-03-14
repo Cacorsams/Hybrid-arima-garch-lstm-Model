@@ -20,6 +20,33 @@ CORS(app)
 from services.forecasting_service import forecast_service
 from data_collection import ForexDataCollector
 
+def clean_for_json(obj):
+    """Recursively replace non-JSON-compliant values (inf, nan) and numpy types"""
+    # Handle numpy scalars first
+    if hasattr(obj, 'dtype'):
+        if np.isscalar(obj):
+            val = obj.item()
+            if isinstance(val, (float, np.floating)):
+                if not np.isfinite(val):
+                    return None
+            return val
+        elif isinstance(obj, np.ndarray):
+            return clean_for_json(obj.tolist())
+
+    if isinstance(obj, (float, np.floating)):
+        if not np.isfinite(obj):
+            return None
+        return float(obj)
+    elif isinstance(obj, (int, np.integer)):
+        return int(obj)
+    elif isinstance(obj, (bool, np.bool_)):
+        return bool(obj)
+    elif isinstance(obj, dict):
+        return {k: clean_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_for_json(i) for i in obj]
+    return obj
+
 @app.route('/', methods=['GET'])
 def index():
     """Root endpoint with basic API info"""
@@ -97,7 +124,7 @@ def evaluate_models():
         test_data = forecast_service.last_training_data.tail(100)
         metrics = forecast_service.evaluate_models(test_data)
         
-        return jsonify({"metrics": metrics})
+        return jsonify(clean_for_json(metrics))
         
     except Exception as e:
         print(f"Error evaluating: {traceback.format_exc()}")
@@ -141,7 +168,7 @@ def run_dm_test():
         errors_arima = test_returns - arima_preds
         
         result = forecast_service.hybrid_model.diebold_mariano_test(errors_hybrid, errors_arima)
-        return jsonify(result)
+        return jsonify(clean_for_json(result))
         
     except Exception as e:
         print(f"Error DM test: {traceback.format_exc()}")

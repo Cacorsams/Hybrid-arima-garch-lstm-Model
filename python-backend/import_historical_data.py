@@ -87,7 +87,7 @@ def import_csv_to_supabase(file_path):
         print(f"✗ Error during import: {e}")
 
 if __name__ == "__main__":
-    CSV_PATH = "../public/Daily KES Exchange Rates.csv"
+    CSV_PATH = "../public/KES_CAD_Transformed_Data.csv"
     
     # Confirm working directory - script should be run from python-backend/
     if not os.path.exists(CSV_PATH):

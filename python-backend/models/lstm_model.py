@@ -89,7 +89,7 @@ class LSTMPredictor:
         recent_seq = scaled_data[-self.lookback:]
         X = recent_seq.reshape(1, self.lookback, 1)
         
-        predictions_scaled = self.model.predict(X)
+        predictions_scaled = self.model.predict(X, verbose=0)
         predictions = self.scaler.inverse_transform(predictions_scaled)
         return float(predictions[0][0])
     
@@ -101,4 +101,7 @@ class LSTMPredictor:
         # Avoid division by zero
         test_data_safe = np.where(test_data == 0, 1e-8, test_data)
         mape = np.mean(np.abs((test_data - predictions) / test_data_safe)) * 100
+        if not np.isfinite(mape):
+            mape = 0.0
+            
         return {'mae': mae, 'rmse': rmse, 'mape': mape}

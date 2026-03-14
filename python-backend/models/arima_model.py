@@ -75,5 +75,11 @@ class ARIMAForecaster:
         mae = mean_absolute_error(test_set, predictions)
         mse = mean_squared_error(test_set, predictions)
         rmse = np.sqrt(mse)
-        mape = np.mean(np.abs((test_set - predictions) / test_set)) * 100
+        
+        # Avoid division by zero and handle non-finite results for JSON compatibility
+        test_set_safe = np.where(test_set == 0, 1e-8, test_set)
+        mape = np.mean(np.abs((test_set - predictions) / test_set_safe)) * 100
+        if not np.isfinite(mape):
+            mape = 0.0
+            
         return {'mae': mae, 'rmse': rmse, 'mape': mape}
