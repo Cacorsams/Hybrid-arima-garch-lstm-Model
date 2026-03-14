@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ForecastChart from '../../components/ForecastChart';
 import VolatilityChart from '../../components/VolatilityChart';
+import Header from '../../components/Header';
 
 export default function Dashboard() {
     const [historicalData, setHistoricalData] = useState<any[]>([]);
@@ -140,34 +141,7 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen bg-[#f5f0eb] pb-20 font-sans text-[#1a1a1a]">
             {/* Global Minimalist Navigation */}
-            <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 backdrop-blur-sm border-b border-[#e0dbd5]">
-                <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
-                    <Link
-                        href="/"
-                        className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight font-serif"
-                    >
-                        QuantForecast®
-                    </Link>
-                    <ul className="hidden md:flex items-center gap-8 text-sm text-[#555]">
-                        <li>
-                            <Link href="/" className="hover:text-[#1a1a1a] transition-colors duration-200">Home</Link>
-                        </li>
-                        <li>
-                            <Link href="/models" className="hover:text-[#1a1a1a] transition-colors duration-200">About</Link>
-                        </li>
-                        <li>
-                            <Link href="/system/dashboard" className="text-[#1a1a1a] font-bold border-b-2 border-[#1a1a1a] pb-1">Dashboard</Link>
-                        </li>
-                    </ul>
-                    <button className="md:hidden text-[#1a1a1a] p-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <line x1="3" y1="6" x2="21" y2="6" />
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="3" y1="18" x2="21" y2="18" />
-                        </svg>
-                    </button>
-                </div>
-            </nav>
+            <Header activePage="dashboard" />
 
             <div className="max-w-7xl mx-auto px-6 md:px-10 mt-12 md:mt-16 space-y-12">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pb-10 border-b border-[#e0dbd5]">
