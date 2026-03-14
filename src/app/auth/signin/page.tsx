@@ -54,30 +54,30 @@ function SigninForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#9CA3AF] flex items-center justify-center p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-[#9CA3AF] dark:bg-[#0a0a0a] flex items-center justify-center p-4 md:p-8 font-sans transition-colors duration-200">
       {/* Toast */}
       {socialMsg && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-full shadow-lg">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-5 py-2.5 rounded-full shadow-lg">
           {socialMsg}
         </div>
       )}
 
-      <div className="w-full max-w-[1150px] min-h-[750px] bg-gradient-to-br from-white to-[#FDF8E8] rounded-[2.5rem] p-2.5 flex flex-col md:flex-row shadow-2xl relative border border-[#FDF8E8]/50">
+      <div className="w-full max-w-[1150px] min-h-[750px] bg-gradient-to-br from-white to-[#FDF8E8] dark:from-[#1e1e1e] dark:to-[#1e1e1e] rounded-[2.5rem] p-2.5 flex flex-col md:flex-row shadow-2xl relative border border-[#FDF8E8]/50 dark:border-gray-800 transition-colors duration-200">
 
         {/* ── Left Panel ─────────────────────────────────────── */}
         <div className="flex-1 p-8 md:p-12 flex flex-col relative z-10">
 
           {/* Logo */}
-          <div className="inline-flex items-center justify-center border border-gray-300 rounded-full px-5 py-1.5 w-max">
-            <span className="text-gray-700 text-sm font-medium">QuantForecast</span>
+          <div className="inline-flex items-center justify-center border border-gray-300 dark:border-gray-700 rounded-full px-5 py-1.5 w-max">
+            <span className="text-gray-700 dark:text-gray-300 text-sm font-medium">QuantForecast</span>
           </div>
 
           {/* Header */}
           <div className="mt-16 md:mt-20 px-2">
-            <h1 className="text-3xl md:text-[32px] font-medium text-gray-900 tracking-tight">
+            <h1 className="text-3xl md:text-[32px] font-medium text-gray-900 dark:text-white tracking-tight">
               Welcome back
             </h1>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               Sign in to your account to continue.
             </p>
           </div>
@@ -86,27 +86,27 @@ function SigninForm() {
           <form onSubmit={handleSubmit} className="mt-10 space-y-5 px-2 max-w-[380px]">
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-3">
-                <p className="text-red-600 text-sm leading-relaxed">{error}</p>
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-2xl px-5 py-3">
+                <p className="text-red-600 dark:text-red-400 text-sm leading-relaxed">{error}</p>
               </div>
             )}
 
             {/* Email */}
             <div className="space-y-1.5">
-              <label className="text-[13px] text-gray-400 ml-4">Email</label>
+              <label className="text-[13px] text-gray-400 dark:text-gray-500 ml-4">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full bg-[#F0EBD8] rounded-full px-6 py-3.5 text-sm text-gray-800 outline-none placeholder:text-gray-500 transition-shadow focus:ring-2 focus:ring-[#F5C842]/50"
+                className="w-full bg-[#F0EBD8] dark:bg-gray-800 rounded-full px-6 py-3.5 text-sm text-gray-800 dark:text-gray-200 outline-none placeholder:text-gray-500 dark:placeholder:text-gray-500 transition-shadow focus:ring-2 focus:ring-[#F5C842]/50 border border-transparent dark:border-gray-700"
               />
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label className="text-[13px] text-gray-400 ml-4">Password</label>
+              <label className="text-[13px] text-gray-400 dark:text-gray-500 ml-4">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -114,12 +114,12 @@ function SigninForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••••••"
                   required
-                  className="w-full bg-[#F0EBD8] rounded-full pl-6 pr-12 py-3.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 tracking-widest transition-shadow focus:ring-2 focus:ring-[#F5C842]/50"
+                  className="w-full bg-[#F0EBD8] dark:bg-gray-800 rounded-full pl-6 pr-12 py-3.5 text-sm text-gray-800 dark:text-gray-200 outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 tracking-widest transition-shadow focus:ring-2 focus:ring-[#F5C842]/50 border border-transparent dark:border-gray-700"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1"
                 >
                   {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
@@ -145,17 +145,17 @@ function SigninForm() {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('Apple')}
-                className="flex-1 flex items-center justify-center gap-2 bg-transparent border border-gray-300 rounded-full py-3 hover:bg-gray-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-transparent border border-gray-300 dark:border-gray-700 rounded-full py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
               >
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.09 2.31-.86 3.5-.8 1.53.05 2.88.7 3.63 1.8-3.14 1.83-2.65 6.08.45 7.36-.75 1.83-1.68 3.01-2.66 3.81zm-4.24-13.8c.25-2.04-1.28-3.95-3.2-4.13-.34 2.18 1.54 4.02 3.2 4.13z" />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">Apple</span>
+                <span className="text-sm font-medium">Apple</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSocialLogin('Google')}
-                className="flex-1 flex items-center justify-center gap-2 bg-transparent border border-gray-300 rounded-full py-3 hover:bg-gray-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-transparent border border-gray-300 dark:border-gray-700 rounded-full py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
               >
                 <svg viewBox="0 0 24 24" width="18" height="18">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -163,20 +163,20 @@ function SigninForm() {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                <span className="text-sm font-medium text-gray-700">Google</span>
+                <span className="text-sm font-medium">Google</span>
               </button>
             </div>
           </form>
 
           {/* Footer */}
-          <div className="mt-auto pt-8 flex justify-between items-center text-xs text-gray-500 px-2">
+          <div className="mt-auto pt-8 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-2">
             <p>
               Don&apos;t have an account?{' '}
-              <a href="/auth/signup" className="text-gray-900 underline font-medium ml-1">
+              <a href="/auth/signup" className="text-gray-900 dark:text-white underline font-medium ml-1">
                 Sign up
               </a>
             </p>
-            <a href="#" className="underline hover:text-gray-700">Terms &amp; Conditions</a>
+            <a href="#" className="underline hover:text-gray-700 dark:hover:text-gray-300">Terms &amp; Conditions</a>
           </div>
         </div>
 
@@ -262,7 +262,7 @@ function SigninForm() {
 export default function SigninPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#9CA3AF] flex items-center justify-center">
+      <div className="min-h-screen bg-[#9CA3AF] dark:bg-[#0a0a0a] flex items-center justify-center transition-colors">
         <div className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin" />
       </div>
     }>

@@ -53,28 +53,28 @@ export default function ProjectPage() {
 
   return (
     <div
-      className="min-h-screen w-full bg-[#f5f0eb]"
+      className="min-h-screen w-full bg-[#f5f0eb] dark:bg-[#121212] transition-colors duration-200"
       style={{
         fontFamily: "'Inter', sans-serif",
       }}
     >
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 backdrop-blur-sm border-b border-[#e0dbd5]">
+      <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 dark:bg-[#121212]/95 backdrop-blur-sm border-b border-[#e0dbd5] dark:border-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
           <Link
             href="/"
-            className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight"
+            className="text-2xl md:text-3xl font-bold text-[#1a1a1a] dark:text-white tracking-tight"
             style={{
               fontFamily: "'DM Serif Display', serif",
             }}
           >
             QuantForecast®
           </Link>
-          <ul className="hidden md:flex items-center gap-8 text-sm text-[#555]">
+          <ul className="hidden md:flex items-center gap-8 text-sm text-[#555] dark:text-gray-400">
             <li>
               <Link
                 href="/"
-                className="hover:text-[#1a1a1a] transition-colors duration-200"
+                className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 Home
               </Link>
@@ -82,7 +82,7 @@ export default function ProjectPage() {
             <li>
               <Link
                 href="/models"
-                className="hover:text-[#1a1a1a] transition-colors duration-200"
+                className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 About
               </Link>
@@ -90,7 +90,7 @@ export default function ProjectPage() {
             <li>
               <Link
                 href="/"
-                className="text-[#1a1a1a] underline underline-offset-4 decoration-[1.5px]"
+                className="text-[#1a1a1a] dark:text-white underline underline-offset-4 decoration-[1.5px]"
               >
                 Project
               </Link>
@@ -98,23 +98,23 @@ export default function ProjectPage() {
             <li>
               <Link
                 href="/system/dashboard"
-                className="hover:text-[#1a1a1a] transition-colors duration-200"
+                className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 Dashboard
               </Link>
             </li>
             <li>
               <a
-                href="#contact"
-                className="hover:text-[#1a1a1a] transition-colors duration-200"
+                href="#documentation"
+                className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
-                Contact
+                Documentation
               </a>
             </li>
           </ul>
           {/* Mobile menu button */}
           <button
-            className="md:hidden text-[#1a1a1a] p-2"
+            className="md:hidden text-[#1a1a1a] dark:text-white p-2"
             aria-label="Open menu"
           >
             <svg
@@ -139,36 +139,36 @@ export default function ProjectPage() {
           {/* Left: Heading + Subtitle */}
           <div className="md:col-span-12 flex flex-col justify-start">
             <h1
-              className="text-[40px] sm:text-[56px] md:text-[64px] lg:text-[72px] leading-[1.1] font-normal text-[#1a1a1a] mb-6 md:mb-8"
+              className="text-[40px] sm:text-[56px] md:text-[64px] lg:text-[72px] leading-[1.1] font-normal text-[#1a1a1a] dark:text-white mb-6 md:mb-8"
               style={{
                 fontFamily: "'DM Serif Display', serif",
               }}
             >
               A HYBRID GARCH-LSTM-ARIMA MODEL <br className="hidden md:block" /> FOR CURRENCY EXCHANGE RATE FORECASTING
             </h1>
-            <p className="text-[#555] text-base md:text-lg leading-relaxed max-w-4xl">
-              A RESEARCH PROPOSAL SUBMITTED TO THE FACULTY OF SCIENCE AND TECHNOLOGY IN PARTIAL FULFILLMENT OF THE REQUIREMENT FOR THE AWARD OF A BACHELOR’s DEGREE IN MATHEMATICS AND COMPUTER SCIENCE, MULTIMEDIA UNIVERSITY OF KENYA (2026)
+            <p className="text-[#555] dark:text-gray-400 text-base md:text-lg leading-relaxed max-w-4xl">
+              A RESEARCH PROPOSAL SUBMITTED TO THE FACULTY OF SCIENCE AND TECHNOLOGY IN PARTIAL FULFILLMENT OF THE REQUIREMENT FOR THE AWARD OF A BACHELOR’S DEGREE IN MATHEMATICS AND COMPUTER SCIENCE, MULTIMEDIA UNIVERSITY OF KENYA (2026)
             </p>
           </div>
         </div>
       </section>
 
       {/* Portfolio Filter Section (Abstract) */}
-      <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 border-b border-[#e0dbd5]">
+      <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 border-b border-[#e0dbd5] dark:border-gray-800">
         <div className="text-center mb-10 md:mb-14">
-          <span className="inline-flex items-center gap-2 text-sm text-[#555] mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] inline-block" />
+          <span className="inline-flex items-center gap-2 text-sm text-[#555] dark:text-gray-400 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] dark:bg-white inline-block" />
             Research Overview
           </span>
           <h2
-            className="text-[36px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.05] font-normal text-[#1a1a1a] mb-6"
+            className="text-[36px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.05] font-normal text-[#1a1a1a] dark:text-white mb-6"
             style={{
               fontFamily: "'DM Serif Display', serif",
             }}
           >
             Project Abstract
           </h2>
-          <div className="text-[#555] text-base md:text-lg leading-relaxed max-w-5xl mx-auto text-left space-y-4">
+          <div className="text-[#555] dark:text-gray-400 text-base md:text-lg leading-relaxed max-w-5xl mx-auto text-left space-y-4">
             <p>
               Currency exchange rate forecasting is a critical challenge in international finance, particularly for developing economies where exchange rate volatility has significant implications for trade, inflation, and investment. Traditional statistical models such as ARIMA and GARCH, while effective at capturing linear trends and time-varying volatility respectively, are individually insufficient to represent the full complexity of modern currency markets.
             </p>
@@ -189,12 +189,12 @@ export default function ProjectPage() {
       <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 overflow-hidden">
         <div className="flex items-end justify-between mb-12">
           <div>
-            <span className="inline-flex items-center gap-2 text-sm text-[#555] mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] inline-block" />
+            <span className="inline-flex items-center gap-2 text-sm text-[#555] dark:text-gray-400 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] dark:bg-white inline-block" />
               Our Experts
             </span>
             <h2
-              className="text-[36px] sm:text-[48px] md:text-[56px] leading-[1.05] font-normal text-[#1a1a1a]"
+              className="text-[36px] sm:text-[48px] md:text-[56px] leading-[1.05] font-normal text-[#1a1a1a] dark:text-white"
               style={{
                 fontFamily: "'DM Serif Display', serif",
               }}
@@ -207,7 +207,7 @@ export default function ProjectPage() {
           <div className="flex gap-4">
             <button
               onClick={prevSlide}
-              className="w-12 h-12 rounded-full border border-[#e0dbd5] flex items-center justify-center text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300"
+              className="w-12 h-12 rounded-full border border-[#e0dbd5] dark:border-gray-800 flex items-center justify-center text-[#1a1a1a] dark:text-white hover:bg-[#1a1a1a] dark:hover:bg-white hover:text-white dark:hover:text-black transition-all duration-300"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M15 18l-6-6 6-6" />
@@ -215,7 +215,7 @@ export default function ProjectPage() {
             </button>
             <button
               onClick={nextSlide}
-              className="w-12 h-12 rounded-full border border-[#e0dbd5] flex items-center justify-center text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300"
+              className="w-12 h-12 rounded-full border border-[#e0dbd5] dark:border-gray-800 flex items-center justify-center text-[#1a1a1a] dark:text-white hover:bg-[#1a1a1a] dark:hover:bg-white hover:text-white dark:hover:text-black transition-all duration-300"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 18l6-6-6-6" />
@@ -295,14 +295,14 @@ export default function ProjectPage() {
                 </div>
 
                 {/* Hover Bio Reveal Overlay */}
-                <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#f5f0eb]/95 backdrop-blur-md flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 text-[#1a1a1a]">
+                <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#f5f0eb]/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 text-[#1a1a1a] dark:text-white">
                   <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'DM Serif Display', serif" }}>
                     {member.name}
                   </h3>
-                  <p className="text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                  <p className="text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 text-[#555] dark:text-gray-400">
                     {member.bio}
                   </p>
-                  <div className="w-8 h-1 bg-[#1a1a1a] rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 delay-300" />
+                  <div className="w-8 h-1 bg-[#1a1a1a] dark:bg-white rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 delay-300" />
                 </div>
               </div>
             );

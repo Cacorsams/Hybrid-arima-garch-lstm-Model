@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
+import { useTheme } from 'next-themes';
+import { Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
   activePage?: 'home' | 'about' | 'dashboard';
@@ -16,7 +18,14 @@ export default function Header({ activePage }: HeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { theme, setTheme } = useTheme();
+
+  // Avoid hydration mismatch by waiting for mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadUser() {
@@ -30,7 +39,7 @@ export default function Header({ activePage }: HeaderProps) {
       }
     }
     loadUser();
-  }, []);
+  }, [supabase.auth]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -55,34 +64,24 @@ export default function Header({ activePage }: HeaderProps) {
     }
   }
 
-  // Generate initials from name
-  function getInitials(name: string) {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  }
-
-  // Deterministic warm hue from name
-  function getAvatarColor(name: string) {
-    const colors = [
-      'bg-amber-400 text-amber-900',
-      'bg-orange-400 text-orange-900',
-      'bg-yellow-400 text-yellow-900',
-      'bg-lime-500 text-lime-900',
-      'bg-teal-400 text-teal-900',
-      'bg-sky-400 text-sky-900',
-      'bg-violet-400 text-violet-900',
-      'bg-rose-400 text-rose-900',
+  // Deterministic avatar URL from name
+  function getAvatarUrl(name: string) {
+    const bgColors = [
+      'ffdfbf', // peach
+      'f5c842', // brand yellow
+      'fcdba1', // yellow-orange
+      'f5ebcf', // light cream
+      'e8d5b5', // tan
+      'ffd1a8', // light orange
+      'f2c89d', // muted orange
+      'e3cfac', // muted gold
     ];
-    const idx = name.charCodeAt(0) % colors.length;
-    return colors[idx];
+    const idx = name.charCodeAt(0) % bgColors.length;
+    const bg = bgColors[idx];
+    return `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(name)}&backgroundColor=${bg}`;
   }
 
-  const initials = user ? getInitials(user.name) : '?';
-  const avatarColor = user ? getAvatarColor(user.name) : 'bg-gray-200 text-gray-600';
+  const avatarUrl = user ? getAvatarUrl(user.name) : '';
 
   const navLinks = [
     { href: '/', label: 'Home', key: 'home' },
@@ -91,27 +90,27 @@ export default function Header({ activePage }: HeaderProps) {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 backdrop-blur-sm border-b border-[#e0dbd5]">
+    <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 dark:bg-[#121212]/95 backdrop-blur-sm border-b border-[#e0dbd5] dark:border-gray-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
 
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight font-serif"
+          className="text-2xl md:text-3xl font-bold text-[#1a1a1a] dark:text-white tracking-tight font-serif"
         >
           QuantForecast®
         </Link>
 
         {/* Desktop nav links */}
-        <ul className="hidden md:flex items-center gap-8 text-sm text-[#555]">
+        <ul className="hidden md:flex items-center gap-8 text-sm text-[#555] dark:text-gray-400">
           {navLinks.map(({ href, label, key }) => (
             <li key={key}>
               <Link
                 href={href}
                 className={
                   activePage === key
-                    ? 'text-[#1a1a1a] font-bold border-b-2 border-[#1a1a1a] pb-1'
-                    : 'hover:text-[#1a1a1a] transition-colors duration-200'
+                    ? 'text-[#1a1a1a] dark:text-white font-bold border-b-2 border-[#1a1a1a] dark:border-white pb-1'
+                    : 'hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200'
                 }
               >
                 {label}
@@ -137,16 +136,16 @@ export default function Header({ activePage }: HeaderProps) {
                   <div className={`absolute inset-0 rounded-full ${
                     dropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                   } transition-opacity duration-300`}>
-                    <div className="w-full h-full rounded-full border-2 border-dashed border-[#1a1a1a]/20 animate-spin [animation-duration:6s]" />
+                    <div className="w-full h-full rounded-full border-2 border-dashed border-[#1a1a1a]/20 dark:border-white/20 animate-spin [animation-duration:6s]" />
                   </div>
                   {/* Avatar circle */}
-                  <div className={`relative w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold select-none transition-transform duration-200 group-hover:scale-110 ${avatarColor}`}>
-                    {initials}
+                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center select-none transition-transform duration-200 group-hover:scale-110 overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <img src={avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                   </div>
                 </div>
 
                 {/* Name — hidden on mobile */}
-                <span className="hidden md:block text-sm font-medium text-[#1a1a1a] max-w-[120px] truncate">
+                <span className="hidden md:block text-sm font-medium text-[#1a1a1a] dark:text-white max-w-[120px] truncate">
                   {user.name}
                 </span>
 
@@ -159,7 +158,7 @@ export default function Header({ activePage }: HeaderProps) {
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  className={`hidden md:block text-[#888] transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  className={`hidden md:block text-[#888] dark:text-gray-500 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
                 >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
@@ -167,16 +166,16 @@ export default function Header({ activePage }: HeaderProps) {
 
               {/* Dropdown */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl border border-[#e0dbd5] shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute right-0 mt-3 w-60 bg-white dark:bg-[#1e1e1e] rounded-2xl border border-[#e0dbd5] dark:border-gray-800 shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {/* User info */}
-                  <div className="px-4 py-4 border-b border-[#f0ede8]">
+                  <div className="px-4 py-4 border-b border-[#f0ede8] dark:border-gray-800">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${avatarColor}`}>
-                        {initials}
+                      <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                        <img src={avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[#1a1a1a] truncate">{user.name}</p>
-                        <p className="text-xs text-[#888] truncate">{user.email}</p>
+                        <p className="text-sm font-semibold text-[#1a1a1a] dark:text-white truncate">{user.name}</p>
+                        <p className="text-xs text-[#888] dark:text-gray-400 truncate">{user.email}</p>
                       </div>
                     </div>
                   </div>
@@ -186,19 +185,36 @@ export default function Header({ activePage }: HeaderProps) {
                     <Link
                       href="/system/dashboard"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#555] hover:bg-[#f9f7f5] hover:text-[#1a1a1a] transition-colors"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                       Dashboard
                     </Link>
+
+                    {/* Theme Toggle */}
+                    {mounted && (
+                      <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+                          <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+                        </div>
+                        {/* Toggle Pill */}
+                        <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${theme === 'dark' ? 'bg-[#f5c842]' : 'bg-gray-300'}`}>
+                          <div className={`w-3 h-3 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </div>
+                      </button>
+                    )}
                   </div>
 
                   {/* Logout */}
-                  <div className="border-t border-[#f0ede8] py-1">
+                  <div className="border-t border-[#f0ede8] dark:border-gray-800 py-1">
                     <button
                       onClick={handleLogout}
                       disabled={loggingOut}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
                     >
                       {loggingOut ? (
                         <span className="w-4 h-4 border border-red-300 border-t-red-500 rounded-full animate-spin" />
@@ -217,13 +233,13 @@ export default function Header({ activePage }: HeaderProps) {
             </div>
           ) : (
             /* Skeleton while loading */
-            <div className="w-9 h-9 rounded-full bg-[#e0dbd5] animate-pulse" />
+            <div className="w-9 h-9 rounded-full bg-[#e0dbd5] dark:bg-gray-800 animate-pulse" />
           )}
 
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="md:hidden text-[#1a1a1a] p-2"
+            className="md:hidden text-[#1a1a1a] dark:text-white p-2"
             aria-label="Toggle menu"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -246,7 +262,7 @@ export default function Header({ activePage }: HeaderProps) {
 
       {/* Mobile dropdown menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#e0dbd5] bg-[#f5f0eb] px-6 py-4 space-y-1">
+        <div className="md:hidden border-t border-[#e0dbd5] dark:border-gray-800 bg-[#f5f0eb] dark:bg-[#121212] px-6 py-4 space-y-1">
           {navLinks.map(({ href, label, key }) => (
             <Link
               key={key}
@@ -254,29 +270,44 @@ export default function Header({ activePage }: HeaderProps) {
               onClick={() => setMobileOpen(false)}
               className={`block py-2.5 text-sm ${
                 activePage === key
-                  ? 'text-[#1a1a1a] font-bold'
-                  : 'text-[#555] hover:text-[#1a1a1a]'
+                  ? 'text-[#1a1a1a] dark:text-white font-bold'
+                  : 'text-[#555] dark:text-gray-400 hover:text-[#1a1a1a] dark:hover:text-white'
               } transition-colors`}
             >
               {label}
             </Link>
           ))}
-          <div className="pt-3 border-t border-[#e0dbd5]">
+          <div className="pt-3 border-t border-[#e0dbd5] dark:border-gray-800">
             {user && (
               <div className="flex items-center gap-3 py-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${avatarColor}`}>
-                  {initials}
+                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                  <img src={avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#1a1a1a] truncate">{user.name}</p>
-                  <p className="text-xs text-[#888] truncate">{user.email}</p>
+                  <p className="text-sm font-medium text-[#1a1a1a] dark:text-white truncate">{user.name}</p>
+                  <p className="text-xs text-[#888] dark:text-gray-400 truncate">{user.email}</p>
                 </div>
               </div>
+            )}
+            {/* Mobile Theme Toggle */}
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="w-full flex items-center justify-between py-2.5 text-sm text-[#555] dark:text-gray-300 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+                  <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+                </div>
+                <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${theme === 'dark' ? 'bg-[#f5c842]' : 'bg-gray-300'}`}>
+                   <div className={`w-3 h-3 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </button>
             )}
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="w-full text-left py-2.5 text-sm text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+              className="w-full text-left py-2.5 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50"
             >
               {loggingOut ? 'Signing out…' : '→ Sign out'}
             </button>

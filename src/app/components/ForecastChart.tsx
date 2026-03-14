@@ -10,26 +10,48 @@ import {
     ResponsiveContainer,
     ComposedChart
 } from 'recharts';
+import { useTheme } from 'next-themes';
+import { useState, useEffect } from 'react';
 
 interface ForecastChartProps {
     data: any[];
 }
 
 export default function ForecastChart({ data }: ForecastChartProps) {
+    const { theme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return <div className="h-full w-full" />;
+
     if (!data || data.length === 0) {
         return (
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-gray-500">No data available for chart</p>
+            <div className="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                <p className="text-gray-500 dark:text-gray-400">No data available for chart</p>
             </div>
         );
     }
+
+    const isDark = theme === 'dark';
+    const gridColor = isDark ? '#333' : '#e0dbd5';
+    const axisColor = isDark ? '#666' : '#888';
+    const tickColor = isDark ? '#aaa' : '#555';
+    const mainColor = isDark ? '#fff' : '#1a1a1a';
+    const tooltipBg = isDark ? '#1e1e1e' : '#fff';
+    const tooltipBorder = isDark ? '#333' : '#e0dbd5';
 
     // Custom tooltip to format dates and values cleanly
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white p-4 border border-gray-200 shadow-lg rounded-xl">
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-50 pb-2">
+                <div 
+                    className="p-4 shadow-lg rounded-xl border"
+                    style={{ backgroundColor: tooltipBg, borderColor: tooltipBorder }}
+                >
+                    <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 border-b border-gray-50 dark:border-gray-800 pb-2">
                         {new Date(label).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                     {payload.map((entry: any, index: number) => {
@@ -45,7 +67,7 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                     })}
                     {/* Display range if available in the payload */}
                     {payload[0]?.payload?.confLower != null && (
-                        <div className="mt-2 pt-2 border-t border-gray-50 text-[10px] text-gray-400 font-mono">
+                        <div className="mt-2 pt-2 border-t border-gray-50 dark:border-gray-800 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
                             Range: {payload[0].payload.confLower.toFixed(4)} - {payload[0].payload.confUpper.toFixed(4)}
                         </div>
                     )}
@@ -60,15 +82,15 @@ export default function ForecastChart({ data }: ForecastChartProps) {
             <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                     data={data}
-                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    margin={{ top: 10, right: 10, left: 20, bottom: 0 }}
                 >
                     <defs>
                         <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#1a1a1a" stopOpacity={0.05} />
-                            <stop offset="95%" stopColor="#1a1a1a" stopOpacity={0} />
+                            <stop offset="5%" stopColor={mainColor} stopOpacity={0.05} />
+                            <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0dbd5" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
                     <XAxis
                         dataKey="date"
                         tickFormatter={(value) => {
@@ -76,21 +98,21 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                             const date = new Date(value);
                             return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                         }}
-                        stroke="#888"
-                        tick={{ fill: '#555', fontSize: 10, fontWeight: 500 }}
+                        stroke={axisColor}
+                        tick={{ fill: tickColor, fontSize: 10, fontWeight: 500 }}
                         dy={10}
                         axisLine={false}
                         tickLine={false}
                     />
                     <YAxis
-                        domain={['auto', 'auto']}
-                        stroke="#888"
-                        tick={{ fill: '#555', fontSize: 10, fontWeight: 500 }}
+                        domain={[(dataMin: number) => dataMin * 0.995, (dataMax: number) => dataMax * 1.005]}
+                        stroke={axisColor}
+                        tick={{ fill: tickColor, fontSize: 10, fontWeight: 500 }}
                         tickFormatter={(value) => value.toFixed(3)}
                         axisLine={false}
                         tickLine={false}
                     />
-                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e0dbd5', strokeWidth: 1 }} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: gridColor, strokeWidth: 1 }} />
                     <Legend
                         verticalAlign="top"
                         align="right"
@@ -103,8 +125,8 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         dataKey={(d) => [d.confLower, d.confUpper]}
                         name="95% Confidence"
                         stroke="none"
-                        fill="#1a1a1a"
-                        fillOpacity={0.05}
+                        fill={isDark ? '#fff' : '#1a1a1a'}
+                        fillOpacity={isDark ? 0.1 : 0.05}
                         connectNulls
                     />
 
@@ -112,10 +134,10 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         type="monotone"
                         dataKey="actual"
                         name="Historical Rate"
-                        stroke="#1a1a1a"
+                        stroke={mainColor}
                         strokeWidth={2.5}
                         dot={false}
-                        activeDot={{ r: 5, strokeWidth: 0, fill: '#1a1a1a' }}
+                        activeDot={{ r: 5, strokeWidth: 0, fill: mainColor }}
                         connectNulls
                     />
 

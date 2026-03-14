@@ -14,9 +14,9 @@ type Profile = {
 };
 
 const STATUS_CONFIG = {
-  pending:  { label: 'Pending',  icon: Clock,       color: 'text-amber-600',  bg: 'bg-amber-50',  dot: 'bg-amber-400' },
-  approved: { label: 'Approved', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', dot: 'bg-emerald-400' },
-  rejected: { label: 'Rejected', icon: XCircle,     color: 'text-red-500',    bg: 'bg-red-50',    dot: 'bg-red-400' },
+  pending:  { label: 'Pending',  icon: Clock,       color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-900/30',  dot: 'bg-amber-400' },
+  approved: { label: 'Approved', icon: CheckCircle, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/30', dot: 'bg-emerald-400' },
+  rejected: { label: 'Rejected', icon: XCircle,     color: 'text-red-500 dark:text-red-400',    bg: 'bg-red-50 dark:bg-red-900/30',    dot: 'bg-red-400' },
 };
 
 export default function AdminUsersPage() {
@@ -83,10 +83,10 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F4F0] font-sans">
+    <div className="min-h-screen bg-[#F5F4F0] dark:bg-[#121212] font-sans transition-colors duration-200">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-5 py-2.5 rounded-full shadow-lg">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-5 py-2.5 rounded-full shadow-lg">
           {toast}
         </div>
       )}
@@ -100,16 +100,16 @@ export default function AdminUsersPage() {
         {/* Page title & Refresh button */}
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
               <span className="font-medium">User Approvals</span>
             </div>
-            <h1 className="text-2xl font-medium text-gray-900 tracking-tight">User Management</h1>
-            <p className="text-gray-500 text-sm mt-1">Review and approve or reject access requests.</p>
+            <h1 className="text-2xl font-medium text-gray-900 dark:text-white tracking-tight">User Management</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Review and approve or reject access requests.</p>
           </div>
           <button
             onClick={fetchProfiles}
             disabled={loading}
-            className="flex items-center gap-2 text-sm bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors shadow-sm"
+            className="flex items-center gap-2 text-sm bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh Data
@@ -126,14 +126,14 @@ export default function AdminUsersPage() {
                 onClick={() => setFilter(key)}
                 className={`text-left rounded-2xl p-5 border transition-all ${
                   isActive
-                    ? 'bg-gray-900 border-gray-900 text-white'
-                    : 'bg-white border-gray-100 text-gray-900 hover:border-gray-300'
+                    ? 'bg-gray-900 border-gray-900 text-white dark:bg-white dark:border-white dark:text-gray-900'
+                    : 'bg-white border-gray-100 text-gray-900 hover:border-gray-300 dark:bg-[#1e1e1e] dark:border-gray-800 dark:text-gray-100 dark:hover:border-gray-600'
                 }`}
               >
-                <p className={`text-3xl font-medium mb-1 ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                <p className={`text-3xl font-medium mb-1 ${isActive ? 'text-white dark:text-gray-900' : 'text-gray-900 dark:text-white'}`}>
                   {counts[key]}
                 </p>
-                <p className={`text-xs capitalize ${isActive ? 'text-gray-300' : 'text-gray-500'}`}>
+                <p className={`text-xs capitalize ${isActive ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
                   {key === 'all' ? 'Total Users' : `${key.charAt(0).toUpperCase() + key.slice(1)}`}
                 </p>
               </button>
@@ -143,47 +143,47 @@ export default function AdminUsersPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl px-6 py-4 mb-6">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-2xl px-6 py-4 mb-6">
+            <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
           </div>
         )}
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           {loading && profiles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-              <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin mb-3" />
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
+              <div className="w-6 h-6 border-2 border-gray-200 dark:border-gray-700 border-t-gray-400 dark:border-t-gray-400 rounded-full animate-spin mb-3" />
               <p className="text-sm">Loading users…</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
               <Users size={36} className="mb-3 opacity-40" />
               <p className="text-sm">No users in this category.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-gray-50 dark:divide-gray-800/60">
               {filtered.map((profile) => {
                 const s = STATUS_CONFIG[profile.status];
                 const StatusIcon = s.icon;
                 return (
                   <div
                     key={profile.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 hover:bg-gray-50/50 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
                   >
                     {/* Left: user info */}
                     <div className="flex items-center gap-4 min-w-0">
                       {/* Avatar initials */}
-                      <div className="w-10 h-10 rounded-xl bg-[#F0EBD8] flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-medium text-gray-700">
+                      <div className="w-10 h-10 rounded-xl bg-[#F0EBD8] dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           {profile.full_name?.charAt(0)?.toUpperCase() ?? profile.email.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                           {profile.full_name ?? '—'}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">{profile.email}</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{profile.email}</p>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
                           Registered {fmtDate(profile.created_at)}
                         </p>
                       </div>
@@ -199,7 +199,7 @@ export default function AdminUsersPage() {
 
                       {/* Role badge */}
                       {profile.role === 'admin' && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100">
                           Admin
                         </span>
                       )}
@@ -222,7 +222,7 @@ export default function AdminUsersPage() {
                           <button
                             onClick={() => handleAction(profile.id, 'reject')}
                             disabled={!!actionLoading}
-                            className="flex items-center gap-1.5 bg-transparent border border-gray-200 hover:border-red-300 hover:text-red-500 disabled:opacity-50 text-gray-500 text-xs font-medium px-4 py-2 rounded-full transition-colors"
+                            className="flex items-center gap-1.5 bg-transparent border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-500/50 hover:text-red-500 disabled:opacity-50 text-gray-500 dark:text-gray-400 text-xs font-medium px-4 py-2 rounded-full transition-colors"
                           >
                             {actionLoading === profile.id + 'reject' ? (
                               <span className="w-3 h-3 border border-gray-400/30 border-t-gray-400 rounded-full animate-spin" />
