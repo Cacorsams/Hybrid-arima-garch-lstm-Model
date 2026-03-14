@@ -29,7 +29,7 @@ export default function Dashboard() {
 
     const fetchHistoricalData = async () => {
         try {
-            const res = await fetch('/api/data/historical?limit=90');
+            const res = await fetch('/api/data/historical?limit=20000');
             if (!res.ok) throw new Error('Failed to fetch data');
             const data = await res.json();
             setHistoricalData(data);
@@ -177,43 +177,43 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    <div className="lg:col-span-8 space-y-12">
-                        {/* Main Forecast Card */}
-                        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow duration-500">
-                            <h2 className="text-xl font-bold text-[#1a1a1a] dark:text-white mb-10 flex items-center gap-3 font-serif">
-                                <span className="w-1.5 h-6 bg-[#1a1a1a] dark:bg-gray-300 rounded-full"></span>
-                                Exchange Rate Forecast
-                            </h2>
-                            <div className="h-[450px]">
-                                {loading ? (
-                                    <div className="h-full flex items-center justify-center bg-[#f9f7f5] dark:bg-gray-800 rounded-2xl animate-pulse" />
-                                ) : (
-                                    <ForecastChart data={chartData} />
-                                )}
-                            </div>
-
-                            {forecast && (
-                                <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {[
-                                        { label: 'ARIMA Mean', val: forecast.arima_component, col: 'text-[#1a1a1a] dark:text-white', bg: 'bg-white dark:bg-[#1e1e1e]' },
-                                        { label: 'GARCH Vol', val: forecast.garch_volatility, col: 'text-[#d94040] dark:text-red-400', bg: 'bg-white dark:bg-[#1e1e1e]' },
-                                        { label: 'LSTM Factor', val: forecast.lstm_component, col: 'text-[#555] dark:text-gray-300', bg: 'bg-white dark:bg-[#1e1e1e]' },
-                                        { label: 'Hybrid Final', val: forecast.combined_prediction, col: 'text-white dark:text-[#1a1a1a] font-black', bg: 'bg-[#1a1a1a] dark:bg-[#f5c842]' },
-                                    ].map((item, i) => (
-                                        <div key={i} className={`p-6 rounded-2xl border border-[#e0dbd5] dark:border-gray-800 transition-all hover:border-[#1a1a1a] dark:hover:border-gray-600 ${item.bg}`}>
-                                            <span className={`text-[10px] uppercase tracking-widest mb-2 block ${i === 3 ? 'text-white/70 dark:text-black/60' : 'text-[#888] dark:text-gray-400'}`}>{item.label}</span>
-                                            <div className={`text-xl font-mono font-bold ${item.col}`}>
-                                                {item.val.toFixed(4)}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                <div className="space-y-12">
+                    {/* Main Forecast Card - Full Width */}
+                    <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow duration-500">
+                        <h2 className="text-xl font-bold text-[#1a1a1a] dark:text-white mb-10 flex items-center gap-3 font-serif">
+                            <span className="w-1.5 h-6 bg-[#1a1a1a] dark:bg-gray-300 rounded-full"></span>
+                            Exchange Rate Forecast
+                        </h2>
+                        <div className="h-[450px]">
+                            {loading ? (
+                                <div className="h-full flex items-center justify-center bg-[#f9f7f5] dark:bg-gray-800 rounded-2xl animate-pulse" />
+                            ) : (
+                                <ForecastChart data={chartData} />
                             )}
                         </div>
 
+                        {forecast && (
+                            <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {[
+                                    { label: 'ARIMA Mean', val: forecast.arima_component, col: 'text-[#1a1a1a] dark:text-white', bg: 'bg-white dark:bg-[#1e1e1e]' },
+                                    { label: 'GARCH Vol', val: forecast.garch_volatility, col: 'text-[#d94040] dark:text-red-400', bg: 'bg-white dark:bg-[#1e1e1e]' },
+                                    { label: 'LSTM Factor', val: forecast.lstm_component, col: 'text-[#555] dark:text-gray-300', bg: 'bg-white dark:bg-[#1e1e1e]' },
+                                    { label: 'Hybrid Final', val: forecast.combined_prediction, col: 'text-white dark:text-[#1a1a1a] font-black', bg: 'bg-[#1a1a1a] dark:bg-[#f5c842]' },
+                                ].map((item, i) => (
+                                    <div key={i} className={`p-6 rounded-2xl border border-[#e0dbd5] dark:border-gray-800 transition-all hover:border-[#1a1a1a] dark:hover:border-gray-600 ${item.bg}`}>
+                                        <span className={`text-[10px] uppercase tracking-widest mb-2 block ${i === 3 ? 'text-white/70 dark:text-black/60' : 'text-[#888] dark:text-gray-400'}`}>{item.label}</span>
+                                        <div className={`text-xl font-mono font-bold ${item.col}`}>
+                                            {item.val.toFixed(4)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                         {/* Volatility Card */}
-                        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm">
+                        <div className="lg:col-span-8 bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm">
                             <h2 className="text-xl font-bold text-[#1a1a1a] dark:text-white mb-10 flex items-center gap-3 font-serif">
                                 <span className="w-1.5 h-6 bg-[#d94040] rounded-full"></span>
                                 Market Volatility (GARCH)
@@ -222,65 +222,66 @@ export default function Dashboard() {
                                 <VolatilityChart data={historicalData.map(d => ({ date: d.date, volatility: d.log_return ? Math.abs(d.log_return) : 0 }))} />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="lg:col-span-4 space-y-10">
-                        {/* Benchmarks Card */}
-                        <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm">
-                            <h2 className="text-xl font-bold text-[#1a1a1a] dark:text-white mb-10 flex items-center gap-3 font-serif">
-                                <span className="w-2 h-2 rounded-full bg-[#1a1a1a] dark:bg-gray-300"></span>
-                                Performance Metrics
-                            </h2>
+                        <div className="lg:col-span-4 space-y-10">
+                            {/* Benchmarks Card */}
+                            <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl p-8 border border-[#e0dbd5] dark:border-gray-800 shadow-sm">
+                                <h2 className="text-xl font-bold text-[#1a1a1a] dark:text-white mb-10 flex items-center gap-3 font-serif">
+                                    <span className="w-2 h-2 rounded-full bg-[#1a1a1a] dark:bg-gray-300"></span>
+                                    Performance Metrics
+                                </h2>
 
-                            {metrics ? (
-                                <div className="space-y-8">
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center p-5 rounded-2xl border border-[#e0dbd5] dark:border-gray-800 bg-[#f9f7f5] dark:bg-gray-800/50">
-                                            <span className="text-xs font-bold text-[#555] dark:text-gray-400 uppercase tracking-widest">ARIMA MAE</span>
-                                            <span className="text-lg font-mono font-bold text-[#1a1a1a] dark:text-gray-200">{metrics.arima?.mae?.toFixed(5) || '0.1245'}</span>
+                                {metrics ? (
+                                    <div className="space-y-8">
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center p-5 rounded-2xl border border-[#e0dbd5] dark:border-gray-800 bg-[#f9f7f5] dark:bg-gray-800/50">
+                                                <span className="text-xs font-bold text-[#555] dark:text-gray-400 uppercase tracking-widest">ARIMA MAE</span>
+                                                <span className="text-lg font-mono font-bold text-[#1a1a1a] dark:text-gray-200">{metrics.arima?.mae?.toFixed(5) || '0.1245'}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center p-5 rounded-2xl border-2 border-[#1a1a1a] dark:border-gray-500 bg-white dark:bg-[#1e1e1e]">
+                                                <span className="text-xs font-black text-[#1a1a1a] dark:text-white uppercase tracking-widest">Hybrid MAE</span>
+                                                <span className="text-xl font-mono font-black text-[#1a1a1a] dark:text-white">{metrics.hybrid?.mae?.toFixed(5) || '0.0432'}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between items-center p-5 rounded-2xl border-2 border-[#1a1a1a] dark:border-gray-500 bg-white dark:bg-[#1e1e1e]">
-                                            <span className="text-xs font-black text-[#1a1a1a] dark:text-white uppercase tracking-widest">Hybrid MAE</span>
-                                            <span className="text-xl font-mono font-black text-[#1a1a1a] dark:text-white">{metrics.hybrid?.mae?.toFixed(5) || '0.0432'}</span>
+
+                                        <div className="pt-8 border-t border-[#e0dbd5] dark:border-gray-800">
+                                            <h3 className="text-[10px] font-black text-[#888] dark:text-gray-500 uppercase tracking-[0.2em] mb-8">Pipeline Configuration</h3>
+                                            <dl className="space-y-6">
+                                                {[
+                                                    { label: 'Stationarity (ADF)', val: 'Passed', col: 'text-[#1a1a1a] dark:text-white' },
+                                                    { label: 'GARCH Stability', val: '0.842 (Stable)', col: 'text-[#1a1a1a] dark:text-white' },
+                                                    { label: 'LSTM Window', val: '60 Trading Days', col: 'text-[#1a1a1a] dark:text-white' },
+                                                ].map((item, i) => (
+                                                    <div key={i} className="flex justify-between border-b border-[#f0eee9] dark:border-gray-800 pb-4">
+                                                        <dt className="text-sm text-[#555] dark:text-gray-400">{item.label}</dt>
+                                                        <dd className={`text-sm font-bold ${item.col}`}>{item.val}</dd>
+                                                    </div>
+                                                ))}
+                                            </dl>
                                         </div>
                                     </div>
-
-                                    <div className="pt-8 border-t border-[#e0dbd5] dark:border-gray-800">
-                                        <h3 className="text-[10px] font-black text-[#888] dark:text-gray-500 uppercase tracking-[0.2em] mb-8">Pipeline Configuration</h3>
-                                        <dl className="space-y-6">
-                                            {[
-                                                { label: 'Stationarity (ADF)', val: 'Passed', col: 'text-[#1a1a1a] dark:text-white' },
-                                                { label: 'GARCH Stability', val: '0.842 (Stable)', col: 'text-[#1a1a1a] dark:text-white' },
-                                                { label: 'LSTM Window', val: '60 Trading Days', col: 'text-[#1a1a1a] dark:text-white' },
-                                            ].map((item, i) => (
-                                                <div key={i} className="flex justify-between border-b border-[#f0eee9] dark:border-gray-800 pb-4">
-                                                    <dt className="text-sm text-[#555] dark:text-gray-400">{item.label}</dt>
-                                                    <dd className={`text-sm font-bold ${item.col}`}>{item.val}</dd>
-                                                </div>
-                                            ))}
-                                        </dl>
+                                ) : (
+                                    <div className="text-center py-20 border-2 border-dashed border-[#e0dbd5] dark:border-gray-700 rounded-3xl">
+                                        <p className="text-[#888] dark:text-gray-400 text-sm">Awaiting pipeline results...</p>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="text-center py-20 border-2 border-dashed border-[#e0dbd5] dark:border-gray-700 rounded-3xl">
-                                    <p className="text-[#888] dark:text-gray-400 text-sm">Awaiting pipeline results...</p>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
 
-                        {/* Methodology Promo */}
-                        <div className="bg-[#1a1a1a] dark:bg-gray-800 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full transform translate-x-10 -translate-y-10 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-700" />
-                            <h2 className="text-2xl font-normal mb-6 font-serif leading-tight">Hybrid Sequential <br/>Integration</h2>
-                            <p className="text-white/60 dark:text-gray-300 text-sm leading-relaxed mb-10">
-                                Sequential framework integrating linear trends (ARIMA), volatility clustering (GARCH), and non-linear residuals (LSTM).
-                            </p>
-                            <Link href="/models" className="inline-flex items-center gap-3 text-sm font-bold border-b border-white/20 pb-1 hover:border-white transition-all">
-                                Technical Deep Dive
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </Link>
+                            {/* Methodology Promo */}
+                            <div className="bg-[#1a1a1a] dark:bg-gray-800 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full transform translate-x-10 -translate-y-10 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-700" />
+                                <h2 className="text-2xl font-normal mb-1 font-serif leading-tight">Hybrid Sequential</h2>
+                                <h2 className="text-2xl font-normal mb-6 font-serif leading-tight">Integration</h2>
+                                <p className="text-white/60 dark:text-gray-300 text-sm leading-relaxed mb-10">
+                                    Sequential framework integrating linear trends (ARIMA), volatility clustering (GARCH), and non-linear residuals (LSTM).
+                                </p>
+                                <Link href="/models" className="inline-flex items-center gap-3 text-sm font-bold border-b border-white/20 pb-1 hover:border-white transition-all">
+                                    Technical Deep Dive
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

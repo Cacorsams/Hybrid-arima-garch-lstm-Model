@@ -1,5 +1,6 @@
+'use client';
+
 import {
-    LineChart,
     Line,
     Area,
     XAxis,
@@ -8,7 +9,8 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
-    ComposedChart
+    ComposedChart,
+    Brush
 } from 'recharts';
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
@@ -42,6 +44,10 @@ export default function ForecastChart({ data }: ForecastChartProps) {
     const mainColor = isDark ? '#fff' : '#1a1a1a';
     const tooltipBg = isDark ? '#1e1e1e' : '#fff';
     const tooltipBorder = isDark ? '#333' : '#e0dbd5';
+    
+    // Brush styling
+    const brushStroke = isDark ? '#444' : '#e0dbd5';
+    const brushFill = isDark ? '#121212' : '#f9f7f5';
 
     // Custom tooltip to format dates and values cleanly
     const CustomTooltip = ({ active, payload, label }: any) => {
@@ -55,7 +61,6 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         {new Date(label).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                     {payload.map((entry: any, index: number) => {
-                        // Skip if value is an array (from Area component) or not a number
                         if (Array.isArray(entry.value) || typeof entry.value !== 'number') return null;
 
                         return (
@@ -65,7 +70,6 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                             </p>
                         );
                     })}
-                    {/* Display range if available in the payload */}
                     {payload[0]?.payload?.confLower != null && (
                         <div className="mt-2 pt-2 border-t border-gray-50 dark:border-gray-800 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
                             Range: {payload[0].payload.confLower.toFixed(4)} - {payload[0].payload.confUpper.toFixed(4)}
@@ -77,8 +81,19 @@ export default function ForecastChart({ data }: ForecastChartProps) {
         return null;
     };
 
+    // Calculate dynamic Y domain with 5% padding
+    // We filter out nulls to avoid NaN in Math functions
+    const allValues = data.flatMap(d => [d.actual, d.forecast, d.confLower, d.confUpper].filter((v): v is number => v !== null));
+    const minVal = Math.min(...allValues);
+    const maxVal = Math.max(...allValues);
+    const range = maxVal - minVal;
+    const domain = [minVal - (range * 0.05), maxVal + (range * 0.05)];
+
+    // Default Brush view: show last 120 days
+    const brushStartIndex = Math.max(0, data.length - 120);
+
     return (
-        <div className="h-full w-full">
+        <div className="w-full h-full pb-4">
             <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                     data={data}
@@ -86,7 +101,7 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                 >
                     <defs>
                         <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={mainColor} stopOpacity={0.05} />
+                            <stop offset="5%" stopColor={mainColor} stopOpacity={0.15} />
                             <stop offset="95%" stopColor={mainColor} stopOpacity={0} />
                         </linearGradient>
                     </defs>
@@ -99,18 +114,20 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                             return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                         }}
                         stroke={axisColor}
-                        tick={{ fill: tickColor, fontSize: 10, fontWeight: 500 }}
-                        dy={10}
-                        axisLine={false}
+                        fontSize={10}
                         tickLine={false}
+                        axisLine={false}
+                        tick={{ fill: tickColor }}
+                        minTickGap={30}
                     />
                     <YAxis
-                        domain={[(dataMin: number) => dataMin * 0.995, (dataMax: number) => dataMax * 1.005]}
+                        domain={domain}
                         stroke={axisColor}
-                        tick={{ fill: tickColor, fontSize: 10, fontWeight: 500 }}
-                        tickFormatter={(value) => value.toFixed(3)}
-                        axisLine={false}
+                        fontSize={10}
                         tickLine={false}
+                        axisLine={false}
+                        tick={{ fill: tickColor }}
+                        tickFormatter={(value) => value.toFixed(3)}
                     />
                     <Tooltip content={<CustomTooltip />} cursor={{ stroke: gridColor, strokeWidth: 1 }} />
                     <Legend
@@ -125,16 +142,17 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         dataKey={(d) => [d.confLower, d.confUpper]}
                         name="95% Confidence"
                         stroke="none"
-                        fill={isDark ? '#fff' : '#1a1a1a'}
-                        fillOpacity={isDark ? 0.1 : 0.05}
+                        fill="#d94040"
+                        fillOpacity={0.1}
                         connectNulls
                     />
 
-                    <Line
+                    <Area
                         type="monotone"
                         dataKey="actual"
                         name="Historical Rate"
                         stroke={mainColor}
+                        fill="url(#colorActual)"
                         strokeWidth={2.5}
                         dot={false}
                         activeDot={{ r: 5, strokeWidth: 0, fill: mainColor }}
@@ -152,6 +170,21 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         activeDot={{ r: 5, strokeWidth: 0, fill: '#d94040' }}
                         connectNulls
                     />
+
+                    <Brush 
+                        dataKey="date" 
+                        height={35} 
+                        stroke={brushStroke}
+                        fill={brushFill}
+                        startIndex={brushStartIndex}
+                        travellerWidth={10}
+                        gap={1}
+                        tickFormatter={() => ""}
+                    >
+                        <ComposedChart>
+                             <Area dataKey="actual" fill={isDark ? "#333" : "#e0dbd5"} stroke="none" fillOpacity={0.5} />
+                        </ComposedChart>
+                    </Brush>
                 </ComposedChart>
             </ResponsiveContainer>
         </div>
