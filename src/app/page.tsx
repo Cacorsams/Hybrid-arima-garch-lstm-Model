@@ -1,110 +1,427 @@
-import Link from 'next/link';
+"use client";
+import React, { useState } from 'react'
+import Link from 'next/link'
 
-export default function Home() {
+const teamMembers = [
+  {
+    name: 'Seth Araka Morisi',
+    bio: 'Lead researcher specializing in ARIMA-GARCH integration and statistical validation.',
+    image: 'https://i.pravatar.cc/800?u=Seth'
+  },
+  {
+    name: 'Austin Kipsigei',
+    bio: 'Expert in quantitative finance and volatility clustering analysis for KES/CAD markets.',
+    image: 'https://i.pravatar.cc/800?u=Austin'
+  },
+  {
+    name: 'Moses Kibarbet',
+    bio: 'Machine learning lead focused on LSTM architecture optimization and neural network training.',
+    image: 'https://i.pravatar.cc/800?u=Moses'
+  },
+  {
+    name: 'Tatiana Oumah',
+    bio: 'Data scientist dedicated to high-frequency financial data cleaning and feature engineering.',
+    image: 'https://i.pravatar.cc/800?u=Tatiana'
+  },
+  {
+    name: 'Collins Akolo',
+    bio: 'Statistical modeler ensuring robustness and significance testing across all hybrid layers.',
+    image: 'https://i.pravatar.cc/800?u=Collins'
+  },
+  {
+    name: 'Ziporah Obiero',
+    bio: 'Research assistant managing data sourcing from CBK and bibliographic documentation.',
+    image: 'https://i.pravatar.cc/800?u=Ziporah'
+  },
+  {
+    name: 'Joseph Kimanzi',
+    bio: 'Financial analyst translating model outputs into actionable macroeconomic insights.',
+    image: 'https://i.pravatar.cc/800?u=Joseph'
+  },
+]
+
+export default function ProjectPage() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % (teamMembers.length - 3));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + (teamMembers.length - 3)) % (teamMembers.length - 3));
+  };
+
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-indigo-100 italic:text-indigo-600">
+    <div
+      className="min-h-screen w-full bg-[#f5f0eb]"
+      style={{
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-black text-xs">HY</span>
-            </div>
-            <span className="font-bold tracking-tighter text-xl">HybridForex</span>
-          </div>
-          <div className="flex items-center gap-8">
-            <Link href="/models" className="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">Methodology</Link>
-            <Link href="/dashboard" className="px-5 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-full hover:bg-gray-800 transition-all">Launch Dashboard</Link>
-          </div>
+      <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 backdrop-blur-sm border-b border-[#e0dbd5]">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
+          <Link
+            href="/"
+            className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight"
+            style={{
+              fontFamily: "'DM Serif Display', serif",
+            }}
+          >
+            QuantForecast®
+          </Link>
+          <ul className="hidden md:flex items-center gap-8 text-sm text-[#555]">
+            <li>
+              <Link
+                href="/"
+                className="hover:text-[#1a1a1a] transition-colors duration-200"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/models"
+                className="hover:text-[#1a1a1a] transition-colors duration-200"
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/"
+                className="text-[#1a1a1a] underline underline-offset-4 decoration-[1.5px]"
+              >
+                Project
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/system/dashboard"
+                className="hover:text-[#1a1a1a] transition-colors duration-200"
+              >
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <a
+                href="#contact"
+                className="hover:text-[#1a1a1a] transition-colors duration-200"
+              >
+                Contact
+              </a>
+            </li>
+          </ul>
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden text-[#1a1a1a] p-2"
+            aria-label="Open menu"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="pt-32 pb-20">
-        <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-              </span>
-              <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">v1.2 Live on Mainnet</span>
-            </div>
-
-            <h1 className="text-7xl font-extrabold tracking-tighter leading-[1.1] text-gray-900">
-              Next-Gen <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Forex</span> Forecasting.
+      <section className="max-w-7xl mx-auto px-6 md:px-10 pt-16 md:pt-24 pb-12 md:pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+          {/* Left: Heading + Subtitle */}
+          <div className="md:col-span-12 flex flex-col justify-start">
+            <h1
+              className="text-[40px] sm:text-[56px] md:text-[64px] lg:text-[72px] leading-[1.1] font-normal text-[#1a1a1a] mb-6 md:mb-8"
+              style={{
+                fontFamily: "'DM Serif Display', serif",
+              }}
+            >
+              A HYBRID GARCH-LSTM-ARIMA MODEL <br className="hidden md:block" /> FOR CURRENCY EXCHANGE RATE FORECASTING
             </h1>
-
-            <p className="text-xl text-gray-500 leading-relaxed max-w-xl">
-              Sequential Hybrid Intelligence combining ARIMA, GARCH, and LSTM architectures
-              to predict KES/CAD exchange rates with unprecedented precision.
+            <p className="text-[#555] text-base md:text-lg leading-relaxed max-w-4xl">
+              A RESEARCH PROPOSAL SUBMITTED TO THE FACULTY OF SCIENCE AND TECHNOLOGY IN PARTIAL FULFILLMENT OF THE REQUIREMENT FOR THE AWARD OF A BACHELOR’s DEGREE IN MATHEMATICS AND COMPUTER SCIENCE, MULTIMEDIA UNIVERSITY OF KENYA (2026)
             </p>
+          </div>
+        </div>
+      </section>
 
+      {/* Portfolio Filter Section (Abstract) */}
+      <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 border-b border-[#e0dbd5]">
+        <div className="text-center mb-10 md:mb-14">
+          <span className="inline-flex items-center gap-2 text-sm text-[#555] mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] inline-block" />
+            Research Overview
+          </span>
+          <h2
+            className="text-[36px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.05] font-normal text-[#1a1a1a] mb-6"
+            style={{
+              fontFamily: "'DM Serif Display', serif",
+            }}
+          >
+            Project Abstract
+          </h2>
+          <div className="text-[#555] text-base md:text-lg leading-relaxed max-w-5xl mx-auto text-left space-y-4">
+            <p>
+              Currency exchange rate forecasting is a critical challenge in international finance, particularly for developing economies where exchange rate volatility has significant implications for trade, inflation, and investment. Traditional statistical models such as ARIMA and GARCH, while effective at capturing linear trends and time-varying volatility respectively, are individually insufficient to represent the full complexity of modern currency markets.
+            </p>
+            <p>
+              Deep learning approaches such as Long Short-Term Memory (LSTM) networks address non-linear dynamics but typically neglect explicit volatility modelling. This study proposes a novel hybrid ARIMA–GARCH–LSTM forecasting framework designed to leverage the complementary strengths of all three approaches in a sequential integration strategy.
+            </p>
+            <p>
+              Applied to daily Kenya Shilling to Canadian Dollar (KES/CAD) exchange rate data sourced from the Central Bank of Kenya, the model first uses ARIMA to capture linear mean dynamics, then applies GARCH to model volatility clustering in the residuals, and finally employs an LSTM network to learn non-linear patterns from the standardized residuals.
+            </p>
+            <p>
+              Forecast accuracy is assessed using MAE, RMSE, and MAPE metrics, with the Diebold–Mariano test employed to determine whether performance improvements over standalone benchmark models are statistically significant. It is expected that the proposed hybrid framework will outperform each of its constituent models individually, providing a more robust and accurate tool for exchange rate prediction in the Kenyan macroeconomic context.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Slider Section */}
+      <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 overflow-hidden">
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <span className="inline-flex items-center gap-2 text-sm text-[#555] mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] inline-block" />
+              Our Experts
+            </span>
+            <h2
+              className="text-[36px] sm:text-[48px] md:text-[56px] leading-[1.05] font-normal text-[#1a1a1a]"
+              style={{
+                fontFamily: "'DM Serif Display', serif",
+              }}
+            >
+              Research Team
+            </h2>
+          </div>
+
+          {/* Slider Controls */}
+          <div className="flex gap-4">
+            <button
+              onClick={prevSlide}
+              className="w-12 h-12 rounded-full border border-[#e0dbd5] flex items-center justify-center text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={nextSlide}
+              className="w-12 h-12 rounded-full border border-[#e0dbd5] flex items-center justify-center text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Slider Track */}
+        <div
+          className="flex gap-6 md:gap-8 transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          style={{
+            transform: `translateX(-${currentIndex * (100 / teamMembers.length)}%)`,
+            width: `${(teamMembers.length / 4) * 100}%`
+          }}
+        >
+          {teamMembers.map((member, idx) => {
+            const styleIdx = idx % 4;
+
+            return (
+              <div
+                key={idx}
+                className="w-1/4 flex-shrink-0 group relative block overflow-hidden rounded-xl aspect-[3/4] bg-[#e8e3dd] cursor-pointer"
+                style={{ width: `${100 / teamMembers.length}%` }}
+              >
+                {/* Background Graphics (Preserving Velisse Brand) */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 z-10" />
+
+                {/* Image Layer */}
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+
+                {/* Abstract Graphics Overlay */}
+                <div className="absolute inset-0 opacity-40 mix-blend-overlay">
+                  {styleIdx === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center scale-75">
+                      <div className="w-32 h-40 bg-[#c9b896] rounded-sm shadow-lg transform rotate-[-3deg]" />
+                      <div className="w-32 h-40 bg-[#d4cfc7] rounded-sm shadow-md transform rotate-[5deg] -ml-12" />
+                    </div>
+                  )}
+                  {styleIdx === 1 && (
+                    <div className="absolute inset-0 flex items-center justify-center scale-75">
+                      <div className="w-48 h-48 rounded-full border-[12px] border-[#c4bfb8] flex items-center justify-center">
+                        <div className="w-20 h-28 bg-[#d94040] rounded-sm transform rotate-[2deg]" />
+                      </div>
+                    </div>
+                  )}
+                  {styleIdx === 2 && (
+                    <div className="absolute inset-0 flex items-center justify-center scale-75">
+                      <div className="grid grid-cols-2 gap-3 transform rotate-[-2deg]">
+                        <div className="w-24 h-16 bg-[#b8b2aa] rounded-sm" />
+                        <div className="w-24 h-16 bg-[#a09a92] rounded-sm" />
+                        <div className="w-24 h-16 bg-[#a09a92] rounded-sm" />
+                        <div className="w-24 h-16 bg-[#b8b2aa] rounded-sm" />
+                      </div>
+                    </div>
+                  )}
+                  {styleIdx === 3 && (
+                    <div className="absolute inset-0 flex items-center justify-center scale-75">
+                      <div className="flex items-end gap-4">
+                        <div className="w-12 h-24 bg-[#1a1a1a] rounded-t-full" />
+                        <div className="w-12 h-32 bg-[#3a3a3a] rounded-t-full" />
+                        <div className="w-12 h-20 bg-[#555] rounded-t-full" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Name Label */}
+                <div className="absolute top-5 left-5 z-20">
+                  <span className="text-white text-sm md:text-base font-medium bg-black/30 backdrop-blur-sm px-3 py-1 rounded">
+                    {member.name}
+                  </span>
+                </div>
+
+                {/* Hover Bio Reveal Overlay */}
+                <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#f5f0eb]/95 backdrop-blur-md flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 text-[#1a1a1a]">
+                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                    {member.name}
+                  </h3>
+                  <p className="text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                    {member.bio}
+                  </p>
+                  <div className="w-8 h-1 bg-[#1a1a1a] rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 delay-300" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#1a1a1a] text-white border-t border-[#2a2a2a]">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-12">
+            {/* Logo + Description */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <h3
+                className="text-3xl md:text-4xl font-bold text-white mb-4"
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                }}
+              >
+                QuantForecast®
+              </h3>
+              <p className="text-[#888] text-sm leading-relaxed max-w-xs">
+                A sequential hybrid forecasting framework combining ARIMA, GARCH, and LSTM architectures to capture the complex dynamics of currency markets.
+              </p>
+            </div>
+
+            {/* Contact Info */}
+            <div id="contact">
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[#666] text-xs uppercase tracking-wider">
+                    Institution:
+                  </span>
+                  <p className="text-white text-sm mt-1">
+                    Multimedia University of Kenya
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[#666] text-xs uppercase tracking-wider">
+                    Research Area:
+                  </span>
+                  <p className="text-white text-sm mt-1">
+                    Faculty of Science and Technology
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[#666] text-xs uppercase tracking-wider">
+                    Target Currency:
+                  </span>
+                  <p className="text-white text-sm mt-1">KES/CAD Exchange Rate</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-white text-sm font-medium mb-4">
+                Navigation
+              </h4>
+              <ul className="space-y-2.5">
+                <li>
+                  <Link
+                    href="/"
+                    className="text-[#888] text-sm hover:text-white transition-colors duration-200"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/models"
+                    className="text-[#888] text-sm hover:text-white transition-colors duration-200"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/"
+                    className="text-[#888] text-sm hover:text-white transition-colors duration-200"
+                  >
+                    Project
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/system/dashboard"
+                    className="text-[#888] text-sm hover:text-white transition-colors duration-200"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Project Details */}
+            <div>
+              <h4 className="text-white text-sm font-medium mb-4">
+                Methodology
+              </h4>
+              <ul className="space-y-2.5">
+                <li><span className="text-[#888] text-sm">Linear Modeling (ARIMA)</span></li>
+                <li><span className="text-[#888] text-sm">Volatility Estimation (GARCH)</span></li>
+                <li><span className="text-[#888] text-sm">Non-linear Learning (LSTM)</span></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-[#2a2a2a] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-[#666] text-xs">
+              © 2026 QuantForecast Research Group.
+            </p>
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="px-8 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all">
-                Access Real-time Analysis
-              </Link>
-              <Link href="/models" className="px-8 py-4 bg-white text-gray-900 border border-gray-200 font-bold rounded-2xl hover:bg-gray-50 transition-all">
-                Read Whitepaper
-              </Link>
+              <span className="text-[#666] text-xs">Multimedia University of Kenya</span>
             </div>
-
-            <div className="pt-10 flex items-center gap-12 border-t border-gray-100">
-              <div>
-                <div className="text-2xl font-black text-gray-900">0.0432</div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Avg MAE</div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-gray-900">94.2%</div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Significance</div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-gray-900">Daily</div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Updates</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -inset-4 bg-indigo-600/5 blur-3xl rounded-full"></div>
-            <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-              <div className="bg-gray-900 p-4 flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                </div>
-                <div className="text-[10px] font-mono text-gray-500 ml-4">KES/CAD Prediction Engine</div>
-              </div>
-              <div className="p-8 space-y-6">
-                <div className="h-4 bg-gray-100 rounded-full w-3/4"></div>
-                <div className="h-40 bg-indigo-50/50 rounded-2xl flex items-end p-4 gap-2">
-                  <div className="flex-1 bg-indigo-200 h-12 rounded"></div>
-                  <div className="flex-1 bg-indigo-300 h-20 rounded"></div>
-                  <div className="flex-1 bg-indigo-400 h-32 rounded"></div>
-                  <div className="flex-1 bg-indigo-500 h-24 rounded"></div>
-                  <div className="flex-1 bg-indigo-600 h-40 rounded animate-pulse"></div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="h-12 bg-gray-50 rounded-xl"></div>
-                  <div className="h-12 bg-gray-50 rounded-xl"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-gray-100 py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400 font-medium">
-          <p>© 2026 HybridForex Research Group. All rights reserved.</p>
-          <div className="flex gap-8 mt-6 md:mt-0">
-            <a href="#" className="hover:text-indigo-600 transition-colors">GitHub</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">Documentation</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">Privacy</a>
           </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }

@@ -2,30 +2,56 @@ import Link from 'next/link';
 
 export default function ModelsPage() {
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 pb-20">
-            {/* Header */}
-            <header className="bg-gray-50 border-b border-gray-100 py-16">
-                <div className="max-w-4xl mx-auto px-6">
-                    <Link href="/" className="text-sm font-bold text-indigo-600 mb-8 inline-block hover:underline">← Back to Home</Link>
-                    <h1 className="text-5xl font-black tracking-tighter text-gray-900">Methodology & Hybrid Architecture</h1>
-                    <p className="mt-4 text-xl text-gray-500 leading-relaxed max-w-2xl">
+        <div className="min-h-screen bg-[#f5f0eb] pb-20 font-sans text-[#1a1a1a]">
+            {/* Standard Navigation */}
+            <nav className="sticky top-0 z-50 bg-[#f5f0eb]/95 backdrop-blur-sm border-b border-[#e0dbd5]">
+                <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
+                    <Link
+                        href="/"
+                        className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight font-serif"
+                    >
+                        QuantForecast®
+                    </Link>
+                    <ul className="hidden md:flex items-center gap-8 text-sm text-[#555]">
+                        <li>
+                            <Link href="/" className="hover:text-[#1a1a1a] transition-colors duration-200">Home</Link>
+                        </li>
+                        <li>
+                            <Link href="/models" className="text-[#1a1a1a] font-bold border-b-2 border-[#1a1a1a] pb-1">About</Link>
+                        </li>
+                        <li>
+                            <Link href="/system/dashboard" className="hover:text-[#1a1a1a] transition-colors duration-200">Dashboard</Link>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <header className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 border-b border-[#e0dbd5]">
+                <div className="max-w-4xl">
+                    <Link href="/" className="text-xs uppercase tracking-widest font-bold text-[#d94040] mb-8 inline-block hover:bg-[#d94040] hover:text-white px-2 py-1 rounded transition-all">
+                        ← Back to Home
+                    </Link>
+                    <h1 className="text-[40px] md:text-[64px] leading-tight font-normal text-[#1a1a1a] font-serif mb-6">
+                        Methodology & <br/>Hybrid Architecture
+                    </h1>
+                    <p className="text-[#555] text-xl leading-relaxed max-w-2xl">
                         A deep dive into how our sequential integration framework combines three diverse modeling techniques to forecast financial markets.
                     </p>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto px-6 py-16 space-y-20">
+            <main className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 space-y-24">
                 {/* Intro */}
-                <section className="space-y-6">
-                    <h2 className="text-3xl font-bold tracking-tight">Sequential Integration Strategy</h2>
-                    <p className="text-gray-600 leading-relaxed text-lg">
+                <section className="max-w-4xl space-y-8">
+                    <h2 className="text-3xl font-normal font-serif text-[#1a1a1a]">Sequential Integration Strategy</h2>
+                    <p className="text-[#555] leading-relaxed text-lg">
                         The core challenge in exchange rate forecasting is the coexistence of linear trends,
                         volatility clusters, and complex non-linear temporal patterns. No single model can
                         capture all these dynamics simultaneously with high precision.
                     </p>
-                    <div className="bg-indigo-50 border border-indigo-100 p-8 rounded-3xl space-y-4">
-                        <div className="font-bold text-indigo-900">The Hybrid Formula:</div>
-                        <div className="text-2xl font-mono text-indigo-700 bg-white p-4 rounded-xl border border-indigo-200">
+                    <div className="bg-white border border-[#e0dbd5] p-10 rounded-3xl space-y-6 shadow-sm">
+                        <div className="font-bold text-[#1a1a1a] text-sm uppercase tracking-widest">The Hybrid Formula:</div>
+                        <div className="text-lg md:text-2xl font-mono text-[#1a1a1a] bg-[#f9f7f5] p-6 rounded-2xl border border-[#e0dbd5]">
                             Forecast = ARIMA(mean) + [GARCH(vol) × LSTM(residual_adj)]
                         </div>
                     </div>
@@ -33,64 +59,63 @@ export default function ModelsPage() {
 
                 {/* Component Breakdown */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 space-y-4">
-                        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">1</div>
-                        <h3 className="text-xl font-bold">ARIMA</h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                            Captures long-term linear trends and autoregressive properties in the raw returns series.
-                        </p>
-                    </div>
-                    <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 space-y-4">
-                        <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white font-bold">2</div>
-                        <h3 className="text-xl font-bold">GARCH</h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                            Estimates time-varying conditional variance from the ARIMA residuals to model risk and volatility clustering.
-                        </p>
-                    </div>
-                    <div className="p-8 bg-gray-50 rounded-3xl border border-gray-100 space-y-4">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-bold">3</div>
-                        <h3 className="text-xl font-bold">LSTM</h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                            A deep Recurrent Neural Network trained on standardized residuals to learn complex, non-linear dependencies.
-                        </p>
-                    </div>
+                    {[
+                        { step: '1', title: 'ARIMA', desc: 'Captures long-term linear trends and autoregressive properties in the raw returns series.', color: 'bg-[#1a1a1a]' },
+                        { step: '2', title: 'GARCH', desc: 'Estimates time-varying conditional variance from the ARIMA residuals to model risk and volatility clustering.', color: 'bg-[#d94040]' },
+                        { step: '3', title: 'LSTM', desc: 'A deep Recurrent Neural Network trained on standardized residuals to learn complex, non-linear dependencies.', color: 'bg-[#555]' },
+                    ].map((item, i) => (
+                        <div key={i} className="p-10 bg-white rounded-3xl border border-[#e0dbd5] space-y-6 hover:shadow-lg transition-all duration-500">
+                            <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center text-white font-bold`}>{item.step}</div>
+                            <h3 className="text-2xl font-normal font-serif text-[#1a1a1a]">{item.title}</h3>
+                            <p className="text-sm text-[#555] leading-relaxed">
+                                {item.desc}
+                            </p>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Mathematical Details */}
-                <section className="space-y-12">
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">ARIMA (Linear Component)</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                            We utilize the Box-Jenkins methodology to fit an Auto-Regressive Integrated Moving Average model.
-                            The Integrated (I) component handles non-stationarity, while AR and MA capture temporal correlations.
-                        </p>
-                    </div>
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                    <div className="space-y-12">
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-normal font-serif text-[#1a1a1a]">ARIMA (Linear Component)</h2>
+                            <p className="text-[#555] leading-relaxed">
+                                We utilize the Box-Jenkins methodology to fit an Auto-Regressive Integrated Moving Average model.
+                                The Integrated (I) component handles non-stationarity, while AR and MA capture temporal correlations.
+                            </p>
+                        </div>
 
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">GARCH (Volatility Modeling)</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                            Since financial returns exhibit "volatility clustering" (periods of high or low volatility),
-                            we use GARCH(1,1) to predict the variance of the next period.
-                        </p>
-                        <div className="bg-gray-900 text-white p-6 rounded-2xl font-mono text-sm">
-                            σₜ² = ω + αεₜ₋₁² + βσₜ₋₁²
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-normal font-serif text-[#1a1a1a]">GARCH (Volatility Modeling)</h2>
+                            <p className="text-[#555] leading-relaxed">
+                                Since financial returns exhibit "volatility clustering" (periods of high or low volatility),
+                                we use GARCH(1,1) to predict the variance of the next period.
+                            </p>
+                            <div className="bg-[#1a1a1a] text-white p-8 rounded-2xl font-mono text-sm shadow-xl">
+                                σₜ² = ω + αεₜ₋₁² + βσₜ₋₁²
+                            </div>
                         </div>
                     </div>
 
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">LSTM (Non-linear Refinement)</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                            Standard residuals are passed to a 2-layer LSTM network. With a lookback of 60 trading days,
-                            the network identifies subtle patterns that classical statistical models missed.
-                        </p>
+                    <div className="space-y-12">
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-normal font-serif text-[#1a1a1a]">LSTM (Non-linear Refinement)</h2>
+                            <p className="text-[#555] leading-relaxed">
+                                Standard residuals are passed to a 2-layer LSTM network. With a lookback of 60 trading days,
+                                the network identifies subtle patterns that classical statistical models missed.
+                            </p>
+                        </div>
+                        
+                        <div className="pt-12 border-t border-[#e0dbd5]">
+                            <Link href="/system/dashboard" className="inline-flex items-center gap-4 px-10 py-5 bg-[#1a1a1a] text-white font-bold rounded-full shadow-2xl hover:bg-[#333] hover:scale-[1.05] transition-all">
+                                Experience the Model Live
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </Link>
+                        </div>
                     </div>
                 </section>
-
-                <div className="pt-10 border-t border-gray-100 flex justify-center">
-                    <Link href="/dashboard" className="px-10 py-5 bg-indigo-600 text-white font-black rounded-full shadow-2xl shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 transition-all">
-                        Experience the Model Live
-                    </Link>
-                </div>
             </main>
         </div>
     );

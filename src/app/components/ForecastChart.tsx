@@ -64,15 +64,11 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                 >
                     <defs>
                         <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.1} />
-                            <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#1a1a1a" stopOpacity={0.05} />
+                            <stop offset="95%" stopColor="#1a1a1a" stopOpacity={0} />
                         </linearGradient>
-                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="3" result="blur" />
-                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f4" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0dbd5" />
                     <XAxis
                         dataKey="date"
                         tickFormatter={(value) => {
@@ -80,25 +76,25 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                             const date = new Date(value);
                             return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                         }}
-                        stroke="#94a3b8"
-                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                        stroke="#888"
+                        tick={{ fill: '#555', fontSize: 10, fontWeight: 500 }}
                         dy={10}
                         axisLine={false}
                         tickLine={false}
                     />
                     <YAxis
                         domain={['auto', 'auto']}
-                        stroke="#94a3b8"
-                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                        stroke="#888"
+                        tick={{ fill: '#555', fontSize: 10, fontWeight: 500 }}
                         tickFormatter={(value) => value.toFixed(3)}
                         axisLine={false}
                         tickLine={false}
                     />
-                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e0dbd5', strokeWidth: 1 }} />
                     <Legend
                         verticalAlign="top"
                         align="right"
-                        wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', fontWeight: 700 }}
+                        wrapperStyle={{ paddingBottom: '30px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}
                         iconType="circle"
                     />
 
@@ -107,8 +103,8 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         dataKey={(d) => [d.confLower, d.confUpper]}
                         name="95% Confidence"
                         stroke="none"
-                        fill="#10B981"
-                        fillOpacity={0.15}
+                        fill="#1a1a1a"
+                        fillOpacity={0.05}
                         connectNulls
                     />
 
@@ -116,10 +112,10 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         type="monotone"
                         dataKey="actual"
                         name="Historical Rate"
-                        stroke="#4F46E5"
-                        strokeWidth={3}
+                        stroke="#1a1a1a"
+                        strokeWidth={2.5}
                         dot={false}
-                        activeDot={{ r: 6, strokeWidth: 0, fill: '#4F46E5' }}
+                        activeDot={{ r: 5, strokeWidth: 0, fill: '#1a1a1a' }}
                         connectNulls
                     />
 
@@ -127,13 +123,12 @@ export default function ForecastChart({ data }: ForecastChartProps) {
                         type="monotone"
                         dataKey="forecast"
                         name="Hybrid Prediction"
-                        stroke="#10B981"
-                        strokeWidth={4}
-                        strokeDasharray="8 8"
+                        stroke="#d94040"
+                        strokeWidth={3}
+                        strokeDasharray="6 6"
                         dot={false}
-                        activeDot={{ r: 6, strokeWidth: 0, fill: '#10B981' }}
+                        activeDot={{ r: 5, strokeWidth: 0, fill: '#d94040' }}
                         connectNulls
-                        filter="url(#glow)"
                     />
                 </ComposedChart>
             </ResponsiveContainer>

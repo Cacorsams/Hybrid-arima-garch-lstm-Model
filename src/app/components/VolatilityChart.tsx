@@ -31,11 +31,11 @@ export default function VolatilityChart({ data }: VolatilityChartProps) {
                 <AreaChart data={data}>
                     <defs>
                         <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1} />
-                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#d94040" stopOpacity={0.05} />
+                            <stop offset="95%" stopColor="#d94040" stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0dbd5" />
                     <XAxis
                         dataKey="date"
                         hide
@@ -47,15 +47,16 @@ export default function VolatilityChart({ data }: VolatilityChartProps) {
                     <Tooltip
                         contentStyle={{
                             backgroundColor: 'white',
-                            borderRadius: '8px',
-                            border: 'none',
-                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            borderRadius: '16px',
+                            border: '1px solid #e0dbd5',
+                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.05)',
+                            padding: '12px'
                         }}
                     />
                     <Area
                         type="monotone"
                         dataKey="volatility"
-                        stroke="#f59e0b"
+                        stroke="#d94040"
                         fillOpacity={1}
                         fill="url(#colorVol)"
                         strokeWidth={2}
