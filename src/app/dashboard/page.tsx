@@ -46,8 +46,11 @@ export default function Dashboard() {
                 const err = await res.json();
                 throw new Error(err.error || 'Training failed');
             }
-            await fetchMetrics();
-            await fetchForecast();
+            await Promise.all([
+                fetchHistoricalData(),
+                fetchMetrics(),
+                fetchForecast()
+            ]);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -72,30 +75,64 @@ export default function Dashboard() {
             const res = await fetch('/api/models/hybrid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ steps: 1 })
+                body: JSON.stringify({ steps: 30 })
             });
             if (res.ok) {
                 const data = await res.json();
-                setForecast(data.forecast);
+                // Ensure we set the inner forecast object
+                if (data.forecast && !Array.isArray(data.forecast)) {
+                    setForecast(data.forecast);
+                } else if (data.forecast && Array.isArray(data.forecast) && data.forecast.length === 0) {
+                    setForecast(null);
+                }
             }
         } catch (err) {
             console.error('Failed to fetch forecast', err);
         }
     };
 
-    const chartData = historicalData.map(d => ({
+    interface DataPoint {
+        date: string;
+        actual: number | null;
+        forecast: number | null;
+        confLower: number | null;
+        confUpper: number | null;
+    }
+
+    const chartData: DataPoint[] = historicalData.map(d => ({
         date: d.date,
         actual: d.close,
-        forecast: null
+        forecast: null,
+        confLower: null,
+        confUpper: null
     }));
 
     if (forecast && historicalData.length > 0) {
+        const lastActual = chartData[chartData.length - 1];
+
+        // Connect the forecast line to the last actual point
+        lastActual.forecast = lastActual.actual;
+        lastActual.confLower = lastActual.actual;
+        lastActual.confUpper = lastActual.actual;
+
         const lastDate = new Date(historicalData[historicalData.length - 1].date);
-        lastDate.setDate(lastDate.getDate() + 1);
-        chartData.push({
-            date: lastDate.toISOString().split('T')[0],
-            actual: null,
-            forecast: forecast.combined_prediction
+
+        // Add forecast steps
+        const predictions = forecast.combined_predictions || [forecast.combined_prediction];
+        const lowers = forecast.confidence_lowers || [forecast.confidence_lower];
+        const uppers = forecast.confidence_uppers || [forecast.confidence_upper];
+
+        predictions.forEach((pred: number, i: number) => {
+            const nextDate = new Date(lastDate);
+            nextDate.setDate(lastDate.getDate() + i + 1);
+
+            chartData.push({
+                date: nextDate.toISOString().split('T')[0],
+                actual: null,
+                forecast: pred,
+                confLower: lowers[i],
+                confUpper: uppers[i]
+            });
         });
     }
 

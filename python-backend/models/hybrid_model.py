@@ -55,7 +55,7 @@ class HybridARIMAGARCHLSTM:
         
         # Step 3: Fit LSTM to standardized residuals
         print("\n[STEP 3/3] Fitting LSTM...")
-        self.lstm.fit(standardized_residuals.values, epochs=50)
+        self.lstm.fit(standardized_residuals.values, epochs=20)
         self.components['lstm'] = {
             'lookback': self.lstm.lookback,
             'units': self.lstm.units,
@@ -66,37 +66,75 @@ class HybridARIMAGARCHLSTM:
         print("✓ HYBRID MODEL SUCCESSFULLY FITTED")
         print("="*60)
     
-    def forecast_hybrid(self, steps=1):
-        """Generate hybrid forecast combining all three components"""
+    def forecast_hybrid(self, steps=1, last_price=1.0):
+        """Generate hybrid forecast and convert log returns to price levels"""
         # Get ARIMA forecast
         arima_forecast = self.arima.forecast(steps=steps)
-        arima_pred = arima_forecast['predictions'].values[-1]
-        arima_conf = arima_forecast['confidence_intervals'].values[-1]
+        arima_preds = arima_forecast['predictions'].values
         
-        # Get GARCH volatility forecast
+        # Get GARCH volatility forecast (standard deviations)
         garch_forecast = self.garch.forecast_variance(horizon=steps)
-        garch_vol = garch_forecast['std'][-1]
+        garch_vols = garch_forecast['std']
         
-        # LSTM contribution
-        # Predict the residual adjustment using the recent standardized residuals
+        # Standardized residuals for LSTM pred
         standardized_resids = self.garch.standardized_residuals.values
-        lstm_pred = self.lstm.predict(standardized_resids)
         
-        # Combine components
-        combined = arima_pred + (lstm_pred * garch_vol)
+        predictions = []
+        arima_comps = []
+        garch_vols_list = []
+        lstm_comps = []
+        conf_lowers = []
+        conf_uppers = []
         
-        # Robust confidence intervals using GARCH volatility
-        # Using 1.96 for 95% confidence
-        conf_lower = combined - (1.96 * garch_vol)
-        conf_upper = combined + (1.96 * garch_vol)
+        # We'll use a simplified walk-forward for multi-step LSTM context
+        temp_std_resids = list(standardized_resids)
+        current_price = last_price
         
+        for i in range(steps):
+            a_p = float(arima_preds[i])
+            g_v = float(garch_vols[i])
+            
+            # LSTM prediction based on context
+            l_p = self.lstm.predict(np.array(temp_std_resids))
+            
+            # Combine components in log-return space
+            combined_log_return = a_p + (l_p * g_v)
+            
+            # Convert to price level: Price(t) = Price(t-1) * exp(LogReturn(t))
+            current_price = current_price * np.exp(combined_log_return)
+            
+            # Compute confidence intervals in price space
+            # Using log-normal distribution approximation
+            # Lower bound: Price(t-1) * exp(combined_log_return - 1.96 * g_v)
+            # Upper bound: Price(t-1) * exp(combined_log_return + 1.96 * g_v)
+            price_before = current_price / np.exp(combined_log_return)
+            c_lower = price_before * np.exp(combined_log_return - (1.96 * g_v))
+            c_upper = price_before * np.exp(combined_log_return + (1.96 * g_v))
+            
+            # Update context for next step residual (approximation)
+            temp_std_resids.append(l_p)
+            
+            predictions.append(float(current_price))
+            arima_comps.append(a_p)
+            garch_vols_list.append(g_v)
+            lstm_comps.append(l_p)
+            conf_lowers.append(float(c_lower))
+            conf_uppers.append(float(c_upper))
+            
         return {
-            'arima_component': float(arima_pred),
-            'garch_volatility': float(garch_vol),
-            'lstm_component': float(lstm_pred),
-            'combined_prediction': float(combined),
-            'confidence_lower': float(conf_lower),
-            'confidence_upper': float(conf_upper)
+            'arima_components': arima_comps,
+            'garch_volatilities': garch_vols_list,
+            'lstm_components': lstm_comps,
+            'combined_predictions': predictions,
+            'confidence_lowers': conf_lowers,
+            'confidence_uppers': conf_uppers,
+            # For backward compatibility or single-step UI refs
+            'arima_component': arima_comps[0],
+            'garch_volatility': garch_vols_list[0],
+            'lstm_component': lstm_comps[0],
+            'combined_prediction': predictions[0],
+            'confidence_lower': conf_lowers[0],
+            'confidence_upper': conf_uppers[0]
         }
     
     def evaluate_all_models(self, test_returns):

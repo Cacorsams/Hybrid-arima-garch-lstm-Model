@@ -23,13 +23,13 @@ class ARIMAForecaster:
         print("Finding optimal ARIMA order...")
         auto_model = auto_arima(
             series,
-            max_p=max_p,
-            max_d=max_d,
-            max_q=max_q,
+            max_p=3,
+            max_d=1,
+            max_q=3,
             seasonal=False,
             stepwise=True,
             information_criterion='aic',
-            trace=True,
+            trace=False,
             error_action='ignore',
             suppress_warnings=True
         )

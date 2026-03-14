@@ -24,8 +24,37 @@ class ForexDataCollector:
         self.fx_data = None
         self.macro_data = None
     
-    def fetch_historical_rates(self, from_symbol="KES", to_symbol="CAD"):
-        """Fetch historical rates from Alpha Vantage API"""
+    def fetch_historical_rates(self, from_symbol="KES", to_symbol="CAD", use_supabase=True):
+        """Fetch historical rates, preferred from Supabase for speed"""
+        if use_supabase:
+            return self.fetch_from_supabase()
+        return self.fetch_from_alpha_vantage(from_symbol, to_symbol)
+
+    def fetch_from_supabase(self):
+        """Fetch historical rates from Supabase table"""
+        try:
+            response = supabase.table("exchange_rates").select("*").order("date").execute()
+            records = response.data
+            
+            if not records:
+                print("⚠ No records found in Supabase, falling back to Alpha Vantage...")
+                return self.fetch_from_alpha_vantage()
+                
+            self.fx_data = pd.DataFrame(records)
+            self.fx_data['date'] = pd.to_datetime(self.fx_data['date'])
+            
+            # Ensure log returns are present
+            if 'log_return' not in self.fx_data.columns or self.fx_data['log_return'].isnull().all():
+                self.fx_data['log_return'] = np.log(self.fx_data['close'] / self.fx_data['close'].shift(1))
+            
+            print(f"✓ Fetched {len(self.fx_data)} records from Supabase")
+            return self.fx_data
+        except Exception as e:
+            print(f"✗ Error fetching from Supabase: {e}")
+            return self.fetch_from_alpha_vantage()
+
+    def fetch_from_alpha_vantage(self, from_symbol="KES", to_symbol="CAD"):
+        """Original Alpha Vantage fetch logic"""
         url = f"https://www.alphavantage.co/query"
         params = {
             "function": "FX_DAILY",

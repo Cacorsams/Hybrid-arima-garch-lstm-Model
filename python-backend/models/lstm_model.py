@@ -52,7 +52,7 @@ class LSTMPredictor:
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
         return model
     
-    def fit(self, data, epochs=50, batch_size=32, validation_split=0.2):
+    def fit(self, data, epochs=30, batch_size=32, validation_split=0.2):
         """Fit LSTM to standardized residuals"""
         scaled_data = self.scaler.fit_transform(data.reshape(-1, 1))
         
@@ -72,7 +72,7 @@ class LSTMPredictor:
             callbacks=[
                 keras.callbacks.EarlyStopping(
                     monitor='val_loss',
-                    patience=10,
+                    patience=5,
                     restore_best_weights=True
                 )
             ]

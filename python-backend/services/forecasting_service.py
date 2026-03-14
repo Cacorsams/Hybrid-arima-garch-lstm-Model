@@ -14,6 +14,7 @@ class ForecastingService:
     def __init__(self, use_cache=True):
         self.hybrid_model = HybridARIMAGARCHLSTM()
         self.is_trained = False
+        self.last_price = None
         
     def train_models(self, fx_history):
         """Train models sequentially on historical data"""
@@ -33,15 +34,16 @@ class ForecastingService:
         # Fit hybrid model pipeline
         self.hybrid_model.fit(fx_history, arima_order=None)
         
+        self.last_price = float(fx_history['close'].iloc[-1])
         self.is_trained = True
         return True
         
     def get_hybrid_forecast(self, steps=1):
-        """Get hybrid forecast"""
+        """Get hybrid forecast in price levels"""
         if not self.is_trained:
             raise RuntimeError("Model must be trained before forecasting")
             
-        return self.hybrid_model.forecast_hybrid(steps=steps)
+        return self.hybrid_model.forecast_hybrid(steps=steps, last_price=self.last_price)
     
     def evaluate_models(self, test_data):
         """Evaluate and return metrics for components"""

@@ -20,6 +20,15 @@ export async function GET() {
         const data = await response.json();
         return NextResponse.json(data);
     } catch (error: any) {
+        // Handle "Model not trained yet" gracefully
+        if (error.message && error.message.includes("not trained yet")) {
+            return NextResponse.json({
+                metrics: null,
+                trained: false,
+                message: "Model not trained yet."
+            });
+        }
+
         console.error('Evaluate API Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

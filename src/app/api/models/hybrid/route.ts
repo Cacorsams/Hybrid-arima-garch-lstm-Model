@@ -23,6 +23,15 @@ export async function POST(request: Request) {
         const data = await response.json();
         return NextResponse.json(data);
     } catch (error: any) {
+        // Handle "Model not trained yet" gracefully
+        if (error.message && error.message.includes("not trained yet")) {
+            return NextResponse.json({
+                forecast: [],
+                trained: false,
+                message: "Model not trained yet. Please trigger training first."
+            });
+        }
+
         console.error('Hybrid API Error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

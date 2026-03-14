@@ -8,6 +8,10 @@ import traceback
 import sys
 import os
 
+# Suppress TensorFlow logging and force CPU mode
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
 # Create Flask app
 app = Flask(__name__)
 # Enable CORS for Next.js frontend
