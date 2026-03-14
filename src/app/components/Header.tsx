@@ -10,15 +10,17 @@ import { useColorTheme } from './ColorThemeProvider';
 
 interface HeaderProps {
   activePage?: 'home' | 'about' | 'dashboard';
+  toggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
 }
 
-export default function Header({ activePage }: HeaderProps) {
+export default function Header({ activePage, toggleSidebar, isSidebarOpen }: HeaderProps) {
   const router = useRouter();
   const supabase = createClient();
   const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
@@ -37,10 +39,10 @@ export default function Header({ activePage }: HeaderProps) {
           user.user_metadata?.full_name ||
           user.email?.split('@')[0] ||
           'User';
-        setUser({ 
-          name, 
-          email: user.email ?? '', 
-          role: user.user_metadata?.role 
+        setUser({
+          name,
+          email: user.email ?? '',
+          role: user.user_metadata?.role
         });
       }
     }
@@ -85,9 +87,28 @@ export default function Header({ activePage }: HeaderProps) {
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
-        
-        {/* Navigation spacer for minimalism */}
-        <div />
+
+        {/* Left side: Mobile hamburger & spacing */}
+        <div className="flex items-center gap-4">
+          {/* Mobile hamburger */}
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden text-[#1a1a1a] dark:text-white p-2 -ml-2 rounded-lg hover:bg-accent dark:hover:bg-accent/50 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              {isSidebarOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
 
         {/* Right side: user area */}
         <div className="flex items-center gap-3">
@@ -100,9 +121,8 @@ export default function Header({ activePage }: HeaderProps) {
               >
                 {/* Avatar with spinning ring */}
                 <div className="relative">
-                  <div className={`absolute -inset-1 rounded-full ${
-                    dropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  } transition-opacity duration-300`}>
+                  <div className={`absolute -inset-1 rounded-full ${dropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    } transition-opacity duration-300`}>
                     <div className="w-full h-full rounded-full border border-dashed border-[#1a1a1a]/20 dark:border-white/20 animate-spin [animation-duration:6s]" />
                   </div>
                   <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800">
@@ -110,8 +130,8 @@ export default function Header({ activePage }: HeaderProps) {
                   </div>
                 </div>
 
-                {/* User Name */}
-                <span className="hidden md:block text-sm font-semibold text-[#1a1a1a] dark:text-white truncate max-w-[150px]">
+                {/* User Name - Now visible on mobile */}
+                <span className="text-sm font-semibold text-[#1a1a1a] dark:text-white truncate max-w-[100px] md:max-w-[150px]">
                   {user.name}
                 </span>
 
@@ -137,8 +157,9 @@ export default function Header({ activePage }: HeaderProps) {
                   <div className="px-5 py-4 border-b border-border">
                     <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground mb-1">Signed in as</p>
                     <p className="text-sm font-bold text-foreground truncate mb-1">{user.email}</p>
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent text-[8px] font-black uppercase tracking-tighter text-muted-foreground border border-border">
-                      {user.email === 'cacorsams@gmail.com' ? 'System Administrator' : (user.role || 'Basic User')}
+                    <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-border ${user.email === 'cacorsams@gmail.com' || user.role === 'admin' ? 'bg-amber-500' : 'bg-red-500'
+                      }`}>
+                      {user.email === 'cacorsams@gmail.com' || user.role === 'admin' ? 'admin' : 'user'}
                     </div>
                   </div>
 
@@ -148,7 +169,7 @@ export default function Header({ activePage }: HeaderProps) {
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-5 py-3 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                       Home
                     </Link>
                     <Link
@@ -156,17 +177,28 @@ export default function Header({ activePage }: HeaderProps) {
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-5 py-3 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                       About
                     </Link>
                     <Link
-                      href="/system/dashboard"
+                      href="/system/hybrid"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                       Dashboard
                     </Link>
+
+                    {(user.email === 'cacorsams@gmail.com' || user.role === 'admin') && (
+                      <Link
+                        href="/system/admin/users"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
+                      >
+                        <img src="/graphicons/3137784.png" className="w-[15px] h-[15px] object-contain opacity-70" alt="Admin" />
+                        User Management
+                      </Link>
+                    )}
 
                     {/* Color Theme Selector */}
                     {mounted && (
@@ -185,9 +217,8 @@ export default function Header({ activePage }: HeaderProps) {
                                 setColorTheme(t.id);
                                 setDropdownOpen(false);
                               }}
-                              className={`relative w-6 h-6 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${
-                                colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
-                              }`}
+                              className={`relative w-6 h-6 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
+                                }`}
                               aria-label={`Set theme to ${t.id}`}
                             >
                               {colorTheme === t.id && <Check size={12} className="text-white drop-shadow-sm" />}
@@ -222,7 +253,7 @@ export default function Header({ activePage }: HeaderProps) {
                       className="w-full flex items-center gap-3 px-5 py-4 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
                       {loggingOut ? 'Signing out…' : 'Sign out'}
                     </button>
@@ -234,100 +265,8 @@ export default function Header({ activePage }: HeaderProps) {
             <div className="w-9 h-9 rounded-full bg-[#e0dbd5] dark:bg-gray-800 animate-pulse" />
           )}
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen((o) => !o)}
-            className="md:hidden text-[#1a1a1a] dark:text-white p-2 ml-2"
-            aria-label="Toggle menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              {mobileOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
-                </>
-              )}
-            </svg>
-          </button>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-300">
-          {user && (
-            <div className="flex items-center gap-4 pb-4 border-b border-border">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-                <img src={avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-base font-bold text-[#1a1a1a] dark:text-white truncate">{user.name}</p>
-                <p className="text-xs text-[#888] dark:text-gray-400 truncate">{user.email}</p>
-              </div>
-            </div>
-          )}
-          
-          <div className="space-y-1">
-            <Link href="/" className="block py-3 text-base text-[#555] dark:text-gray-400">Home</Link>
-            <Link href="/models" className="block py-3 text-base text-[#555] dark:text-gray-400">About</Link>
-            <Link href="/system/dashboard" className="block py-3 text-base text-[#555] dark:text-gray-400">Dashboard</Link>
-            
-            {mounted && (
-              <div className="py-4 border-b border-border">
-                <p className="text-xs font-bold text-[#888] dark:text-gray-500 uppercase tracking-widest mb-4">Color Theme</p>
-                <div className="flex items-center gap-4">
-                  {([
-                    { id: 'teal', color: 'bg-teal-500' },
-                    { id: 'mustard', color: 'bg-[#eab308]' },
-                    { id: 'green', color: 'bg-green-500' },
-                    { id: 'magenta', color: 'bg-[#d946ef]' }
-                  ] as const).map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => {
-                        setColorTheme(t.id);
-                        setMobileOpen(false);
-                      }}
-                      className={`relative w-8 h-8 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${
-                        colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
-                      }`}
-                      aria-label={`Set theme to ${t.id}`}
-                    >
-                      {colorTheme === t.id && <Check size={16} className="text-white drop-shadow-sm" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="w-full flex items-center justify-between py-4 text-base text-[#555] dark:text-gray-400"
-              >
-                <div className="flex items-center gap-3">
-                  {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                  <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-                </div>
-                <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${theme === 'dark' ? 'bg-[#f5c842]' : 'bg-gray-300'}`}>
-                   <div className={`w-3 h-3 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`} />
-                </div>
-              </button>
-            )}
-            
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="w-full text-left py-4 text-base text-red-500 font-bold"
-            >
-              {loggingOut ? 'Signing out…' : 'Sign out'}
-            </button>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

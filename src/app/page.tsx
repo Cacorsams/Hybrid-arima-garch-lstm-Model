@@ -42,6 +42,7 @@ const teamMembers = [
 
 export default function ProjectPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % (teamMembers.length - 3));
@@ -97,7 +98,7 @@ export default function ProjectPage() {
             </li>
             <li>
               <Link
-                href="/system/dashboard"
+                href="/system/hybrid"
                 className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 Dashboard
@@ -115,7 +116,8 @@ export default function ProjectPage() {
           {/* Mobile menu button */}
           <button
             className="md:hidden text-[#1a1a1a] dark:text-white p-2"
-            aria-label="Open menu"
+            aria-label="Toggle menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <svg
               width="24"
@@ -125,12 +127,54 @@ export default function ProjectPage() {
               stroke="currentColor"
               strokeWidth="1.5"
             >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
+              {mobileMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
             </svg>
           </button>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-[#e0dbd5] dark:border-gray-800 bg-[#f5f0eb] dark:bg-[#121212] px-6 py-4 animate-in slide-in-from-top-4 duration-200">
+            <ul className="flex flex-col gap-4 text-base font-medium text-[#1a1a1a] dark:text-white">
+              <li>
+                <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/models" onClick={() => setMobileMenuOpen(false)}>
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/" className="underline underline-offset-4" onClick={() => setMobileMenuOpen(false)}>
+                  Project
+                </Link>
+              </li>
+              <li>
+                <Link href="/system/hybrid" onClick={() => setMobileMenuOpen(false)}>
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <a href="#documentation" onClick={() => setMobileMenuOpen(false)}>
+                  Documentation
+                </a>
+              </li>
+            </ul>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -389,7 +433,7 @@ export default function ProjectPage() {
                 </li>
                 <li>
                   <Link
-                    href="/system/dashboard"
+                    href="/system/hybrid"
                     className="text-[#888] text-sm hover:text-white transition-colors duration-200"
                   >
                     Dashboard

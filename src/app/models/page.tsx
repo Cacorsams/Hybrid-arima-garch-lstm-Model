@@ -20,7 +20,7 @@ export default function ModelsPage() {
                             <Link href="/models" className="text-[#1a1a1a] dark:text-white font-bold border-b-2 border-[#1a1a1a] dark:border-white pb-1">About</Link>
                         </li>
                         <li>
-                            <Link href="/system/dashboard" className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200">Dashboard</Link>
+                            <Link href="/system/hybrid" className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200">Dashboard</Link>
                         </li>
                     </ul>
                 </div>
@@ -32,7 +32,7 @@ export default function ModelsPage() {
                         ← Back to Home
                     </Link>
                     <h1 className="text-[40px] md:text-[64px] leading-tight font-normal text-[#1a1a1a] dark:text-white font-serif mb-6">
-                        Methodology & <br/>Hybrid Architecture
+                        Methodology & <br />Hybrid Architecture
                     </h1>
                     <p className="text-[#555] dark:text-gray-400 text-xl leading-relaxed max-w-2xl">
                         A deep dive into how our sequential integration framework combines three diverse modeling techniques to forecast financial markets.
@@ -105,9 +105,9 @@ export default function ModelsPage() {
                                 the network identifies subtle patterns that classical statistical models missed.
                             </p>
                         </div>
-                        
+
                         <div className="pt-12 border-t border-[#e0dbd5] dark:border-gray-800">
-                            <Link href="/system/dashboard" className="inline-flex items-center gap-4 px-10 py-5 bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] font-bold rounded-full shadow-2xl hover:bg-[#333] dark:hover:bg-gray-200 hover:scale-[1.05] transition-all">
+                            <Link href="/system/hybrid" className="inline-flex items-center gap-4 px-10 py-5 bg-[#1a1a1a] dark:bg-white text-white dark:text-[#1a1a1a] font-bold rounded-full shadow-2xl hover:bg-[#333] dark:hover:bg-gray-200 hover:scale-[1.05] transition-all">
                                 Experience the Model Live
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
