@@ -106,7 +106,7 @@ export default function ProjectPage() {
             </li>
             <li>
               <a
-                href="#documentation"
+                href="/Documentation"
                 className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 Documentation
@@ -168,7 +168,7 @@ export default function ProjectPage() {
                 </Link>
               </li>
               <li>
-                <a href="#documentation" onClick={() => setMobileMenuOpen(false)}>
+                <a href="/Documentation" onClick={() => setMobileMenuOpen(false)}>
                   Documentation
                 </a>
               </li>
