@@ -31,8 +31,8 @@ export default function ForecastChart({ data }: ForecastChartProps) {
 
     if (!data || data.length === 0) {
         return (
-            <div className="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p className="text-gray-500 dark:text-gray-400">No data available for chart</p>
+            <div className="h-64 flex items-center justify-center bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-border">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No data available for chart</p>
             </div>
         );
     }

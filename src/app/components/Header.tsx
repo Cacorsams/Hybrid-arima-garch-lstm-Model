@@ -85,15 +85,15 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
   const avatarUrl = user ? getAvatarUrl(user.name) : '';
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border transition-colors duration-200 font-sans">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between h-14 md:h-16">
 
         {/* Left side: Mobile hamburger & spacing */}
         <div className="flex items-center gap-4">
           {/* Mobile hamburger */}
           <button
             onClick={toggleSidebar}
-            className="md:hidden text-[#1a1a1a] dark:text-white p-2 -ml-2 rounded-lg hover:bg-accent dark:hover:bg-accent/50 transition-colors"
+            className="md:hidden text-zinc-700 dark:text-zinc-200 p-2 -ml-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             aria-label="Toggle menu"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -125,13 +125,13 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                     } transition-opacity duration-300`}>
                     <div className="w-full h-full rounded-full border border-dashed border-[#1a1a1a]/20 dark:border-white/20 animate-spin [animation-duration:6s]" />
                   </div>
-                  <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800">
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
                     <img src={avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                   </div>
                 </div>
 
                 {/* User Name - Now visible on mobile */}
-                <span className="text-sm font-semibold text-[#1a1a1a] dark:text-white truncate max-w-[100px] md:max-w-[150px]">
+                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate max-w-[100px] md:max-w-[150px]">
                   {user.name}
                 </span>
 
@@ -152,22 +152,22 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-3 w-64 bg-card rounded-2xl border border-border shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute right-0 mt-2 w-56 bg-card rounded-xl border border-border shadow-lg overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {/* Email only - per user request */}
-                  <div className="px-5 py-4 border-b border-border">
-                    <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground mb-1">Signed in as</p>
-                    <p className="text-sm font-bold text-foreground truncate mb-1">{user.email}</p>
-                    <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-border ${user.email === 'cacorsams@gmail.com' || user.role === 'admin' ? 'bg-amber-500' : 'bg-red-500'
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-[11px] uppercase tracking-wider font-medium text-zinc-500 dark:text-zinc-400 mb-0.5">Signed in as</p>
+                    <p className="text-sm font-medium text-foreground truncate mb-1">{user.email}</p>
+                    <div className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium text-white ${user.email === 'cacorsams@gmail.com' || user.role === 'admin' ? 'bg-amber-500' : 'bg-red-500'
                       }`}>
                       {user.email === 'cacorsams@gmail.com' || user.role === 'admin' ? 'admin' : 'user'}
                     </div>
                   </div>
 
-                  <div className="py-1">
+                  <div className="py-0.5">
                     <Link
                       href="/"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-5 py-3 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors rounded-lg mx-1"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                       Home
@@ -175,7 +175,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                     <Link
                       href="/models"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-5 py-3 text-sm text-[#555] dark:text-gray-300 hover:bg-[#f9f7f5] dark:hover:bg-gray-800 hover:text-[#1a1a1a] dark:hover:text-white transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors rounded-lg mx-1"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                       About
@@ -183,7 +183,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                     <Link
                       href="/system/hybrid"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors rounded-lg mx-1"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                       Dashboard
@@ -193,7 +193,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                       <Link
                         href="/system/admin/users"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors rounded-lg mx-1"
                       >
                         <Users size={15} className="opacity-70" />
                         User Management
@@ -202,9 +202,9 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
 
                     {/* Color Theme Selector */}
                     {mounted && (
-                      <div className="px-5 py-3 border-b border-border">
-                        <p className="text-[10px] uppercase font-bold text-muted-foreground mb-3">Color Theme</p>
-                        <div className="flex items-center gap-3">
+                      <div className="px-4 py-2.5 border-b border-border">
+                        <p className="text-[11px] uppercase tracking-wider font-medium text-zinc-500 dark:text-zinc-400 mb-2">Color Theme</p>
+                        <div className="flex items-center gap-2.5">
                           {([
                             { id: 'teal', color: 'bg-teal-500' },
                             { id: 'mustard', color: 'bg-[#eab308]' }, // approx mustard-500
@@ -217,11 +217,11 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                                 setColorTheme(t.id);
                                 setDropdownOpen(false);
                               }}
-                              className={`relative w-6 h-6 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ring-2 ${colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
+                              className={`relative w-5 h-5 rounded-full ${t.color} flex items-center justify-center transition-transform hover:scale-105 focus:outline-none ring-2 ${colorTheme === t.id ? 'ring-primary ring-offset-2 ring-offset-background' : 'ring-transparent'
                                 }`}
                               aria-label={`Set theme to ${t.id}`}
                             >
-                              {colorTheme === t.id && <Check size={12} className="text-white drop-shadow-sm" />}
+                              {colorTheme === t.id && <Check size={10} className="text-white drop-shadow-sm" />}
                             </button>
                           ))}
                         </div>
@@ -232,7 +232,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                     {mounted && (
                       <button
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                        className="w-full flex items-center justify-between px-5 py-3 text-sm text-muted-foreground hover:bg-accent dark:hover:bg-accent/50 hover:text-foreground transition-colors"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors rounded-lg mx-1"
                       >
                         <div className="flex items-center gap-3">
                           {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
@@ -246,11 +246,11 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
                   </div>
 
                   {/* Logout */}
-                  <div className="border-t border-border pt-1">
+                  <div className="border-t border-border">
                     <button
                       onClick={handleLogout}
                       disabled={loggingOut}
-                      className="w-full flex items-center gap-3 px-5 py-4 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                      className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50 rounded-lg mx-1 my-1"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
@@ -262,7 +262,7 @@ export default function Header({ activePage, toggleSidebar, isSidebarOpen }: Hea
               )}
             </div>
           ) : (
-            <div className="w-9 h-9 rounded-full bg-[#e0dbd5] dark:bg-gray-800 animate-pulse" />
+            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
           )}
 
         </div>

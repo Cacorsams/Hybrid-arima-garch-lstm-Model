@@ -82,52 +82,50 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-6 animate-in fade-in duration-700 font-sans">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-5 py-2.5 rounded-full shadow-lg">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm px-4 py-2 rounded-lg shadow-lg">
           {toast}
         </div>
       )}
 
       <div>
         {/* Page title & Refresh button */}
-        <div className="mb-8 flex items-end justify-between">
+        <div className="mb-6 flex items-end justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-              <span className="font-medium">User Approvals</span>
-            </div>
-            <h1 className="text-2xl font-medium text-gray-900 dark:text-white tracking-tight">User Management</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Review and approve or reject access requests.</p>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">User Approvals</p>
+            <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">User Management</h1>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-0.5">Review and approve or reject access requests.</p>
           </div>
           <button
             onClick={fetchProfiles}
             disabled={loading}
-            className="flex items-center gap-2 text-sm bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            className="flex items-center gap-2 text-sm bg-card border border-border text-zinc-700 dark:text-zinc-300 px-3 py-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Refresh Data
           </button>
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {(['all', 'pending', 'approved', 'rejected'] as const).map((key) => {
             const isActive = filter === key;
             return (
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className={`text-left rounded-2xl p-5 border transition-all ${
+                className={`text-left rounded-xl p-4 border transition-colors ${
                   isActive
-                    ? 'bg-gray-900 border-gray-900 text-white dark:bg-white dark:border-white dark:text-gray-900'
-                    : 'bg-white border-gray-100 text-gray-900 hover:border-gray-300 dark:bg-[#1e1e1e] dark:border-gray-800 dark:text-gray-100 dark:hover:border-gray-600'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100 text-white dark:text-zinc-900'
+                    : 'bg-card border-border text-zinc-900 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
                 }`}
               >
-                <p className={`text-3xl font-medium mb-1 ${isActive ? 'text-white dark:text-gray-900' : 'text-gray-900 dark:text-white'}`}>
+                <p className={`text-2xl font-semibold mb-0.5 ${isActive ? 'text-white dark:text-zinc-900' : 'text-zinc-900 dark:text-zinc-100'}`}>
                   {counts[key]}
                 </p>
-                <p className={`text-xs capitalize ${isActive ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                <p className={`text-[11px] capitalize ${isActive ? 'text-zinc-300 dark:text-zinc-600' : 'text-zinc-500 dark:text-zinc-400'}`}>
                   {key === 'all' ? 'Total Users' : `${key.charAt(0).toUpperCase() + key.slice(1)}`}
                 </p>
               </button>
@@ -137,91 +135,91 @@ export default function AdminUsersPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-2xl px-6 py-4 mb-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-4">
             <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
           </div>
         )}
 
         {/* Table */}
-        <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
           {loading && profiles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
-              <div className="w-6 h-6 border-2 border-gray-200 dark:border-gray-700 border-t-gray-400 dark:border-t-gray-400 rounded-full animate-spin mb-3" />
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-500 dark:text-zinc-400">
+              <div className="w-5 h-5 border-2 border-zinc-200 dark:border-zinc-700 border-t-zinc-500 dark:border-t-zinc-400 rounded-full animate-spin mb-2" />
               <p className="text-sm">Loading users…</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
-              <Users size={36} className="mb-3 opacity-40" />
+            <div className="flex flex-col items-center justify-center py-16 text-zinc-500 dark:text-zinc-400">
+              <Users size={32} className="mb-2 opacity-40" />
               <p className="text-sm">No users in this category.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50 dark:divide-gray-800/60">
+            <div className="divide-y divide-border">
               {filtered.map((profile) => {
                 const s = STATUS_CONFIG[profile.status];
                 const StatusIcon = s.icon;
                 return (
                   <div
                     key={profile.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 py-3.5 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors"
                   >
                     {/* Left: user info */}
-                    <div className="flex items-center gap-4 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       {/* Avatar initials */}
-                      <div className="w-10 h-10 rounded-xl bg-[#F0EBD8] dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                           {profile.full_name?.charAt(0)?.toUpperCase() ?? profile.email.charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                           {profile.full_name ?? '—'}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{profile.email}</p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{profile.email}</p>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                           Registered {fmtDate(profile.created_at)}
                         </p>
                       </div>
                     </div>
 
                     {/* Right: badge + actions */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
                       {/* Status badge */}
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${s.bg} ${s.color}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${s.bg} ${s.color}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
                         {s.label}
                       </span>
 
                       {/* Role badge */}
                       {profile.role === 'admin' && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100">
                           Admin
                         </span>
                       )}
 
                       {/* Action buttons — only for pending */}
                       {profile.status === 'pending' && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5">
                           <button
                             onClick={() => handleAction(profile.id, 'approve')}
                             disabled={!!actionLoading}
-                            className="flex items-center gap-1.5 bg-[#F5C842] hover:bg-[#EAB308] disabled:opacity-50 text-gray-900 text-xs font-medium px-4 py-2 rounded-full transition-colors"
+                            className="flex items-center gap-1.5 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground text-xs font-medium px-3 py-2 rounded-lg transition-colors"
                           >
                             {actionLoading === profile.id + 'approve' ? (
-                              <span className="w-3 h-3 border border-gray-900/30 border-t-gray-900 rounded-full animate-spin" />
+                              <span className="w-3 h-3 border border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                             ) : (
-                              <CheckCircle size={13} />
+                              <CheckCircle size={14} />
                             )}
                             Approve
                           </button>
                           <button
                             onClick={() => handleAction(profile.id, 'reject')}
                             disabled={!!actionLoading}
-                            className="flex items-center gap-1.5 bg-transparent border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-500/50 hover:text-red-500 disabled:opacity-50 text-gray-500 dark:text-gray-400 text-xs font-medium px-4 py-2 rounded-full transition-colors"
+                            className="flex items-center gap-1.5 bg-transparent border border-border hover:border-red-300 dark:hover:border-red-500/50 hover:text-red-500 disabled:opacity-50 text-zinc-500 dark:text-zinc-400 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
                           >
                             {actionLoading === profile.id + 'reject' ? (
-                              <span className="w-3 h-3 border border-gray-400/30 border-t-gray-400 rounded-full animate-spin" />
+                              <span className="w-3 h-3 border border-zinc-400/30 border-t-zinc-400 rounded-full animate-spin" />
                             ) : (
-                              <XCircle size={13} />
+                              <XCircle size={14} />
                             )}
                             Reject
                           </button>
