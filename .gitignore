@@ -55,6 +55,7 @@ Thumbs.db
 
 # Database / Local Secrets
 *.txt
+!requirements.txt
 reset_db.py
 *.md
 !README.md
@@ -63,3 +64,4 @@ reset_db.py
 
 # Supabase
 .supabase/
+.vercel

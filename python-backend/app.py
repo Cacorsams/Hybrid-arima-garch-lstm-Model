@@ -176,4 +176,6 @@ def run_dm_test():
 
 if __name__ == '__main__':
     # Default Flask port 5000 is used by Next.js `.env.local`
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Railway and other cloud providers inject a PORT environment variable
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
