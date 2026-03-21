@@ -19,6 +19,7 @@ CORS(app)
 
 from services.forecasting_service import forecast_service
 from models.arima_model import ARIMAForecaster
+from models.garch_model import GARCHVolatilityModeler
 from data_collection import ForexDataCollector
 
 # ---------------------------------------------------------------------------
@@ -32,6 +33,17 @@ class _ARIMAService:
         self.last_price = None # last price level for converting log-returns → price
 
 arima_service = _ARIMAService()
+
+# ---------------------------------------------------------------------------
+# Standalone GARCH state
+# ---------------------------------------------------------------------------
+class _GARCHService:
+    def __init__(self):
+        self.model = GARCHVolatilityModeler(p=1, q=1)
+        self.is_trained = False
+        self.last_data = None
+
+garch_service = _GARCHService()
 
 def clean_for_json(obj):
     """Recursively replace non-JSON-compliant values (inf, nan) and numpy types"""
@@ -318,6 +330,110 @@ def arima_metrics():
         }))
     except Exception as e:
         print(f"Error in ARIMA metrics: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ---------------------------------------------------------------------------
+# Standalone GARCH routes
+# ---------------------------------------------------------------------------
+
+@app.route('/api/garch/train', methods=['POST'])
+def garch_train():
+    """Train standalone GARCH(1,1) model on the latest data"""
+    try:
+        collector = ForexDataCollector()
+        fx_data = collector.fetch_historical_rates()
+        if fx_data is None or fx_data.empty:
+            return jsonify({"error": "Failed to fetch historical data"}), 500
+
+        # Note: log_returns are used directly as residuals (assuming mean 0)
+        log_returns = fx_data['log_return'].dropna()
+        garch_service.model = GARCHVolatilityModeler(p=1, q=1)
+        garch_service.model.fit(log_returns)
+        garch_service.is_trained = True
+        garch_service.last_data = fx_data
+
+        params = garch_service.model.get_parameters()
+        persistence_info = garch_service.model.check_persistence()
+
+        return jsonify(clean_for_json({
+            "message": "GARCH model trained successfully",
+            "parameters": params,
+            "persistence": persistence_info['persistence'],
+            "is_stable": persistence_info['is_stable'],
+            "records_used": len(fx_data),
+        }))
+    except Exception as e:
+        print(f"Error training GARCH: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/garch/forecast', methods=['GET'])
+def garch_forecast():
+    """Return N-step GARCH conditional volatility forecast"""
+    try:
+        if not garch_service.is_trained:
+            return jsonify({"error": "GARCH model not trained yet. Call /api/garch/train first."}), 400
+
+        steps = int(request.args.get('steps', 30))
+        result = garch_service.model.forecast_variance(horizon=steps)
+
+        # variance is an array of length `horizon`
+        predicted_variance = result['variance']
+        predicted_volatility = result['std']
+
+        return jsonify(clean_for_json({
+            "steps": steps,
+            "forecast_variance": predicted_variance.tolist() if hasattr(predicted_variance, 'tolist') else list(predicted_variance),
+            "forecast_volatility": predicted_volatility.tolist() if hasattr(predicted_volatility, 'tolist') else list(predicted_volatility),
+        }))
+    except Exception as e:
+        print(f"Error in GARCH forecast: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/garch/metrics', methods=['GET'])
+def garch_metrics():
+    """Evaluate GARCH, return historical diagnostic log-returns vs volatility"""
+    try:
+        if not garch_service.is_trained:
+            return jsonify({"error": "Model not trained yet."}), 400
+
+        df = garch_service.last_data
+        log_returns = df['log_return'].dropna()
+
+        # In-sample conditional standard deviation (volatility)
+        cond_vol = garch_service.model.conditional_variance ** 0.5
+
+        # Build diagnostic chart data (last 100 points)
+        diag_size = min(100, len(log_returns))
+        recent_df = df.dropna(subset=['log_return']).tail(diag_size)
+        
+        dates = recent_df['date'].astype(str).values.tolist()
+        actual_returns = recent_df['log_return'].values
+        # conditional volatility aligns with the log_returns index since they were passed together
+        recent_cond_vol = cond_vol.loc[recent_df.index].values
+
+        diagnostics = []
+        for i in range(diag_size):
+            diagnostics.append({
+                "date": dates[i],
+                "actual_return": float(actual_returns[i]),
+                "abs_return": abs(float(actual_returns[i])),  # empirical volatility proxy
+                "conditional_volatility": float(recent_cond_vol[i])
+            })
+
+        params = garch_service.model.get_parameters()
+        persistence_info = garch_service.model.check_persistence()
+
+        return jsonify(clean_for_json({
+            "parameters": params,
+            "persistence": persistence_info['persistence'],
+            "is_stable": persistence_info['is_stable'],
+            "diagnostics": diagnostics
+        }))
+    except Exception as e:
+        print(f"Error in GARCH metrics: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
 
