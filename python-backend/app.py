@@ -21,7 +21,8 @@ from services.forecasting_service import forecast_service
 from models.arima_model import ARIMAForecaster
 from models.garch_model import GARCHVolatilityModeler
 from models.lstm_model import LSTMPredictor
-from data_collection import ForexDataCollector
+from data_collection import ForexDataCollector, supabase
+from datetime import datetime, timedelta
 
 # ---------------------------------------------------------------------------
 # Standalone ARIMA state (independent from the hybrid pipeline)
@@ -281,6 +282,27 @@ def arima_forecast():
             price_preds.append(round(float(current), 8))
             price_lower.append(round(float(cl),      8))
             price_upper.append(round(float(cu),      8))
+
+        # Save forecast to database (async-ish insertion)
+        try:
+            order_str = f"({arima_service.model.order[0]},{arima_service.model.order[1]},{arima_service.model.order[2]})"
+            last_date = pd.to_datetime(arima_service.last_data['date'].iloc[-1])
+            arima_records = []
+            for i in range(steps):
+                forecast_date = (last_date + timedelta(days=i+1)).strftime("%Y-%m-%d")
+                arima_records.append({
+                    "forecast_date": forecast_date,
+                    "predicted_return": float(predictions_log[i]) if np.isfinite(predictions_log[i]) else 0.0,
+                    "predicted_rate": price_preds[i],
+                    "confidence_interval_lower": price_lower[i],
+                    "confidence_interval_upper": price_upper[i],
+                    "arima_order": order_str
+                })
+            supabase.table("arima_predictions").upsert(arima_records, on_conflict="forecast_date").execute()
+            print(f"✓ Saved {len(arima_records)} ARIMA forecast records to DB")
+        except Exception as db_e:
+            print(f"⚠ Database error saving ARIMA forecast: {db_e}")
+
         return jsonify(clean_for_json({
             "steps": steps,
             "last_price": last_price,
@@ -331,6 +353,19 @@ def arima_metrics():
             })
 
         # Also expose model diagnostics
+        try:
+            last_date = arima_service.last_data['date'].iloc[-1]
+            summary_record = {
+                "forecast_date": str(last_date),
+                "mae": float(metrics['mae']),
+                "rmse": float(metrics['rmse']),
+                "mape": float(metrics['mape']),
+                "arima_order": f"({arima_service.model.order[0]},{arima_service.model.order[1]},{arima_service.model.order[2]})"
+            }
+            supabase.table("arima_predictions").upsert(summary_record, on_conflict="forecast_date").execute()
+        except Exception as db_e:
+            print(f"⚠ Database error saving ARIMA metrics: {db_e}")
+
         return jsonify(clean_for_json({
             "mae":   metrics['mae'],
             "rmse":  metrics['rmse'],
@@ -426,6 +461,26 @@ def garch_metrics():
         actual_returns = recent_df['log_return'].values
         # conditional volatility aligns with the log_returns index since they were passed together
         recent_cond_vol = cond_vol.loc[recent_df.index].values
+
+        # Save GARCH results to DB
+        try:
+            garch_records = []
+            order_str = f"({garch_service.model.p},{garch_service.model.q})"
+            for idx, row in recent_df.iterrows():
+                cv = float(garch_service.model.conditional_variance.loc[idx])
+                cs = float(cond_vol.loc[idx])
+                res = float(garch_service.model.standardized_residuals.loc[idx])
+                garch_records.append({
+                    "date": row['date'].strftime("%Y-%m-%d"),
+                    "conditional_variance": cv,
+                    "conditional_std": cs,
+                    "standardized_residuals": res,
+                    "garch_order": order_str
+                })
+            supabase.table("garch_volatility").upsert(garch_records, on_conflict="date").execute()
+            print(f"✓ Saved {len(garch_records)} GARCH records to DB")
+        except Exception as db_e:
+            print(f"⚠ Database error saving GARCH: {db_e}")
 
         diagnostics = []
         for i in range(diag_size):
@@ -527,6 +582,23 @@ def lstm_forecast():
             current = current * np.exp(lr)
             price_preds.append(float(current))
 
+        # Save LSTM forecast
+        try:
+            last_date = pd.to_datetime(lstm_service.last_data['date'].iloc[-1])
+            lstm_records = []
+            for i in range(steps):
+                forecast_date = (last_date + timedelta(days=i+1)).strftime("%Y-%m-%d")
+                lstm_records.append({
+                    "forecast_date": forecast_date,
+                    "predicted_return": float(predicted_log_returns[i]),
+                    "predicted_rate": price_preds[i],
+                    "model_epoch": int(30) # Default epochs
+                })
+            supabase.table("lstm_predictions").upsert(lstm_records, on_conflict="forecast_date").execute()
+            print(f"✓ Saved {len(lstm_records)} LSTM forecast records")
+        except Exception as db_e:
+            print(f"⚠ Database error saving LSTM: {db_e}")
+
         # Note: LSTM doesn't natively give a statistical confidence interval without bayesian dropout or similar.
         # We will return the predictions, frontend can omit the CI band.
         return jsonify(clean_for_json({
@@ -565,6 +637,20 @@ def lstm_metrics():
                 "train_mae": float(train_mae[i]) if i < len(train_mae) else None,
                 "val_mae": float(val_mae[i]) if i < len(val_mae) else None,
             })
+
+        # Save summary metrics to DB
+        try:
+            last_date = lstm_service.last_data['date'].iloc[-1]
+            summary_record = {
+                "forecast_date": str(last_date),
+                "mae": float(train_mae[-1]) if len(train_mae) > 0 else 0,
+                "model_epoch": epochs_run
+            }
+            # We don't have rmse/mape calculated here easily without rerunning evaluation on a test set
+            # but we can save what we have.
+            supabase.table("lstm_predictions").upsert(summary_record, on_conflict="forecast_date").execute()
+        except Exception as db_e:
+            print(f"⚠ Database error saving LSTM metrics: {db_e}")
 
         return jsonify(clean_for_json({
             "epochs": epochs_run,
