@@ -18,7 +18,20 @@ app = Flask(__name__)
 CORS(app)
 
 from services.forecasting_service import forecast_service
+from models.arima_model import ARIMAForecaster
 from data_collection import ForexDataCollector
+
+# ---------------------------------------------------------------------------
+# Standalone ARIMA state (independent from the hybrid pipeline)
+# ---------------------------------------------------------------------------
+class _ARIMAService:
+    def __init__(self):
+        self.model = ARIMAForecaster()
+        self.is_trained = False
+        self.last_data = None  # holds the full DataFrame used for training
+        self.last_price = None # last price level for converting log-returns → price
+
+arima_service = _ARIMAService()
 
 def clean_for_json(obj):
     """Recursively replace non-JSON-compliant values (inf, nan) and numpy types"""
@@ -174,8 +187,113 @@ def run_dm_test():
         print(f"Error DM test: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
+# ---------------------------------------------------------------------------
+# Standalone ARIMA routes
+# ---------------------------------------------------------------------------
+
+@app.route('/api/arima/train', methods=['POST'])
+def arima_train():
+    """Train standalone ARIMA model on the latest data"""
+    try:
+        collector = ForexDataCollector()
+        fx_data = collector.fetch_historical_rates()
+        if fx_data is None or fx_data.empty:
+            return jsonify({"error": "Failed to fetch historical data"}), 500
+
+        log_returns = fx_data['log_return'].dropna()
+        arima_service.model = ARIMAForecaster()  # fresh instance each time
+        arima_service.model.fit(log_returns)
+        arima_service.is_trained = True
+        arima_service.last_data = fx_data
+        # Store last closing price to anchor forecast in price space
+        arima_service.last_price = float(fx_data['close'].dropna().iloc[-1])
+
+        return jsonify(clean_for_json({
+            "message": "ARIMA model trained successfully",
+            "order": list(arima_service.model.order),
+            "aic": arima_service.model.aic,
+            "bic": arima_service.model.bic,
+            "records_used": len(fx_data),
+        }))
+    except Exception as e:
+        print(f"Error training ARIMA: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/arima/forecast', methods=['GET'])
+def arima_forecast():
+    """Return N-step ARIMA forecast as price levels with 95 % CI"""
+    try:
+        if not arima_service.is_trained:
+            return jsonify({"error": "ARIMA model not trained yet. Call /api/arima/train first."}), 400
+
+        steps = int(request.args.get('steps', 30))
+        result = arima_service.model.forecast(steps=steps)
+
+        predictions_log = result['predictions'].values        # log-return space
+        conf_int        = result['confidence_intervals']      # DataFrame with 2 cols
+        lower_log       = conf_int.iloc[:, 0].values
+        upper_log       = conf_int.iloc[:, 1].values
+
+        # Convert log-returns → cumulative price levels
+        last_price = arima_service.last_price
+        price_preds  = []
+        price_lower  = []
+        price_upper  = []
+        current = last_price
+        for i in range(steps):
+            current = current * np.exp(predictions_log[i])
+            cl = (current / np.exp(predictions_log[i])) * np.exp(lower_log[i])
+            cu = (current / np.exp(predictions_log[i])) * np.exp(upper_log[i])
+            price_preds.append(float(current))
+            price_lower.append(float(cl))
+            price_upper.append(float(cu))
+
+        return jsonify(clean_for_json({
+            "steps": steps,
+            "last_price": last_price,
+            "arima_order": list(arima_service.model.order),
+            "predictions": price_preds,
+            "confidence_lowers": price_lower,
+            "confidence_uppers": price_upper,
+        }))
+    except Exception as e:
+        print(f"Error in ARIMA forecast: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/arima/metrics', methods=['GET'])
+def arima_metrics():
+    """Evaluate ARIMA on the held-out last-20 % of training data"""
+    try:
+        if not arima_service.is_trained:
+            return jsonify({"error": "Model not trained yet."}), 400
+
+        df = arima_service.last_data
+        log_returns = df['log_return'].dropna()
+        n = max(30, int(len(log_returns) * 0.2))
+        test_set  = log_returns.values[-n:]
+        # Use fitted values as in-sample approximation for the test window
+        fitted = arima_service.model.fitted_model.fittedvalues
+        test_preds = fitted.values[-n:]
+        metrics = arima_service.model.evaluate(test_set, test_preds)
+
+        # Also expose model diagnostics
+        return jsonify(clean_for_json({
+            "mae":   metrics['mae'],
+            "rmse":  metrics['rmse'],
+            "mape":  metrics['mape'],
+            "aic":   arima_service.model.aic,
+            "bic":   arima_service.model.bic,
+            "order": list(arima_service.model.order),
+            "test_size": n,
+        }))
+    except Exception as e:
+        print(f"Error in ARIMA metrics: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == '__main__':
     # Default Flask port 5000 is used by Next.js `.env.local`
-    # Railway and other cloud providers inject a PORT environment variable
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+

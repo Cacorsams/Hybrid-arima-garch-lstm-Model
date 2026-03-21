@@ -21,7 +21,8 @@ export default function Dashboard() {
         setLoading(true);
         await Promise.all([
             fetchHistoricalData(),
-            fetchMetrics()
+            fetchMetrics(),
+            fetchForecast()
         ]);
         setLoading(false);
     };
@@ -199,7 +200,7 @@ export default function Dashboard() {
                                 <div key={i} className={`p-4 rounded-xl border border-border ${item.bg}`}>
                                     <span className={`text-[11px] uppercase tracking-wider mb-1 block ${i === 3 ? 'text-white/70 dark:text-black/60' : 'text-zinc-500 dark:text-zinc-400'}`}>{item.label}</span>
                                     <div className={`text-base font-mono font-semibold ${item.col}`}>
-                                        {item.val.toFixed(4)}
+                                        {typeof item.val === 'number' ? item.val.toFixed(4) : '—'}
                                     </div>
                                 </div>
                             ))}
