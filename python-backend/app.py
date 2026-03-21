@@ -20,6 +20,7 @@ CORS(app)
 from services.forecasting_service import forecast_service
 from models.arima_model import ARIMAForecaster
 from models.garch_model import GARCHVolatilityModeler
+from models.lstm_model import LSTMPredictor
 from data_collection import ForexDataCollector
 
 # ---------------------------------------------------------------------------
@@ -44,6 +45,18 @@ class _GARCHService:
         self.last_data = None
 
 garch_service = _GARCHService()
+
+# ---------------------------------------------------------------------------
+# Standalone LSTM state
+# ---------------------------------------------------------------------------
+class _LSTMService:
+    def __init__(self):
+        self.model = LSTMPredictor(lookback=30, units=100)
+        self.is_trained = False
+        self.last_data = None
+        self.last_price = None
+
+lstm_service = _LSTMService()
 
 def clean_for_json(obj):
     """Recursively replace non-JSON-compliant values (inf, nan) and numpy types"""
@@ -434,6 +447,133 @@ def garch_metrics():
         }))
     except Exception as e:
         print(f"Error in GARCH metrics: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ---------------------------------------------------------------------------
+# Standalone LSTM routes
+# ---------------------------------------------------------------------------
+
+@app.route('/api/lstm/train', methods=['POST'])
+def lstm_train():
+    """Train standalone LSTM model on log returns"""
+    try:
+        collector = ForexDataCollector()
+        fx_data = collector.fetch_historical_rates()
+        if fx_data is None or fx_data.empty:
+            return jsonify({"error": "Failed to fetch historical data"}), 500
+
+        log_returns = fx_data['log_return'].dropna().values
+        lstm_service.model = LSTMPredictor(lookback=30, units=100)
+        
+        # Train LSTM natively on log_returns
+        lstm_service.model.fit(log_returns, epochs=30, batch_size=32)
+        
+        lstm_service.is_trained = True
+        lstm_service.last_data = fx_data
+        lstm_service.last_price = float(fx_data['close'].dropna().iloc[-1])
+
+        # Extract training metrics
+        history = lstm_service.model.history.history
+        val_loss = history.get('val_loss', [])
+        loss = history.get('loss', [])
+        epochs_run = len(loss)
+        
+        return jsonify(clean_for_json({
+            "message": "LSTM model trained successfully",
+            "epochs": epochs_run,
+            "final_loss": float(loss[-1]) if epochs_run > 0 else 0,
+            "final_val_loss": float(val_loss[-1]) if len(val_loss) > 0 else 0,
+            "records_used": len(log_returns),
+        }))
+    except Exception as e:
+        print(f"Error training LSTM: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/lstm/forecast', methods=['GET'])
+def lstm_forecast():
+    """Return N-step iterative LSTM forecast as price levels"""
+    try:
+        if not lstm_service.is_trained:
+            return jsonify({"error": "LSTM model not trained yet. Call /api/lstm/train first."}), 400
+
+        steps = int(request.args.get('steps', 30))
+        
+        df = lstm_service.last_data
+        log_returns = df['log_return'].dropna().values
+        lookback = lstm_service.model.lookback
+        
+        # We need the last `lookback` log returns to start the chain
+        current_sequence = list(log_returns[-lookback:])
+        
+        predicted_log_returns = []
+        for _ in range(steps):
+            # predict 1 step ahead
+            seq_arr = np.array(current_sequence[-lookback:])
+            # The predictor automatically scales the input internaly, but it expects a full array to scale properly?
+            # Actually, `predictor.predict` currently calls `scaler.transform`. It's fine to pass the whole sequence or just the back window.
+            # `predict(data)` in lstm_model.py expects an array, transforms it, and uses the last `lookback` elements.
+            next_log_return = lstm_service.model.predict(seq_arr)
+            predicted_log_returns.append(next_log_return)
+            current_sequence.append(next_log_return)
+
+        # Convert log-returns → consecutive price levels
+        last_price = lstm_service.last_price
+        price_preds = []
+        current = last_price
+        
+        for lr in predicted_log_returns:
+            current = current * np.exp(lr)
+            price_preds.append(float(current))
+
+        # Note: LSTM doesn't natively give a statistical confidence interval without bayesian dropout or similar.
+        # We will return the predictions, frontend can omit the CI band.
+        return jsonify(clean_for_json({
+            "steps": steps,
+            "last_price": last_price,
+            "predictions": price_preds,
+            "predicted_log_returns": predicted_log_returns
+        }))
+    except Exception as e:
+        print(f"Error in LSTM forecast: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/lstm/metrics', methods=['GET'])
+def lstm_metrics():
+    """Evaluate LSTM on the training process and in-sample residuals"""
+    try:
+        if not lstm_service.is_trained:
+            return jsonify({"error": "Model not trained yet."}), 400
+
+        history = lstm_service.model.history.history
+        epochs_run = len(history.get('loss', []))
+
+        # Format loss curves for frontend charting
+        loss_curve = []
+        train_loss = history.get('loss', [])
+        val_loss = history.get('val_loss', [])
+        train_mae = history.get('mae', [])
+        val_mae = history.get('val_mae', [])
+        
+        for i in range(epochs_run):
+            loss_curve.append({
+                "epoch": i + 1,
+                "train_loss": float(train_loss[i]),
+                "val_loss": float(val_loss[i]) if i < len(val_loss) else None,
+                "train_mae": float(train_mae[i]) if i < len(train_mae) else None,
+                "val_mae": float(val_mae[i]) if i < len(val_mae) else None,
+            })
+
+        return jsonify(clean_for_json({
+            "epochs": epochs_run,
+            "final_loss": float(train_loss[-1]) if epochs_run > 0 else 0,
+            "final_val_loss": float(val_loss[-1]) if len(val_loss) > 0 else 0,
+            "loss_curve": loss_curve
+        }))
+    except Exception as e:
+        print(f"Error in LSTM metrics: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
 
 
