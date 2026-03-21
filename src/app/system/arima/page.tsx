@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import ArimaForecastChart from '../../components/ArimaForecastChart';
-import VolatilityChart from '../../components/VolatilityChart';
+import ArimaDiagnosticsChart from '../../components/ArimaDiagnosticsChart';
+
+interface DiagnosticPoint {
+    date: string;
+    actual: number;
+    fitted: number;
+    residual: number;
+}
 
 interface ArimaMetrics {
     mae: number;
@@ -12,6 +19,7 @@ interface ArimaMetrics {
     bic: number;
     order: number[];
     test_size: number;
+    diagnostics: DiagnosticPoint[];
 }
 
 interface ArimaForecastData {
@@ -122,10 +130,7 @@ export default function ArimaPage() {
         });
     }
 
-    const volatilityData = historicalData.map(d => ({
-        date: d.date,
-        volatility: d.log_return ? Math.abs(d.log_return) : 0,
-    }));
+    // (VolatilityData removed)
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700 font-sans">
@@ -218,17 +223,19 @@ export default function ArimaPage() {
 
                 {/* Bottom row */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* Log Return / Volatility proxy */}
+                    {/* Residuals / Fit Diagnostics */}
                     <div className="lg:col-span-8 bg-card rounded-xl p-5 border border-border">
                         <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
                             <span className="w-1.5 h-4 bg-destructive rounded-full" />
-                            Log Return Magnitude
+                            In-Sample Fit & Residuals
                         </h2>
                         <div className="h-[240px]">
-                            {loading ? (
-                                <div className="h-full bg-zinc-50 dark:bg-zinc-800/50 rounded-xl animate-pulse" />
+                            {loading || !metrics ? (
+                                <div className="h-full flex items-center justify-center bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-border border-dashed">
+                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">Run pipeline to show diagnostics</p>
+                                </div>
                             ) : (
-                                <VolatilityChart data={volatilityData} />
+                                <ArimaDiagnosticsChart data={metrics.diagnostics} />
                             )}
                         </div>
                     </div>

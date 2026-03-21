@@ -280,10 +280,30 @@ def arima_metrics():
         log_returns = df['log_return'].dropna()
         n = max(30, int(len(log_returns) * 0.2))
         test_set  = log_returns.values[-n:]
+        
         # Use fitted values as in-sample approximation for the test window
-        fitted = arima_service.model.fitted_model.fittedvalues
-        test_preds = fitted.values[-n:]
+        fitted_series = arima_service.model.fitted_model.fittedvalues
+        test_preds = fitted_series.values[-n:]
         metrics = arima_service.model.evaluate(test_set, test_preds)
+
+        # Build diagnostic chart data (last 100 points for UI)
+        diag_size = min(100, len(log_returns))
+        recent_df = df.dropna(subset=['log_return']).tail(diag_size)
+        
+        dates = recent_df['date'].astype(str).values.tolist()
+        actuals = recent_df['log_return'].values
+        fitted_recent = fitted_series.loc[recent_df.index].values
+        # residuals = actuals - fitted
+        residuals = actuals - fitted_recent
+
+        diagnostics = []
+        for i in range(diag_size):
+            diagnostics.append({
+                "date": dates[i],
+                "actual": float(actuals[i]),
+                "fitted": float(fitted_recent[i]),
+                "residual": float(residuals[i])
+            })
 
         # Also expose model diagnostics
         return jsonify(clean_for_json({
@@ -294,6 +314,7 @@ def arima_metrics():
             "bic":   arima_service.model.bic,
             "order": list(arima_service.model.order),
             "test_size": n,
+            "diagnostics": diagnostics
         }))
     except Exception as e:
         print(f"Error in ARIMA metrics: {traceback.format_exc()}")
