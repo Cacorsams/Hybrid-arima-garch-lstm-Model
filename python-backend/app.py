@@ -231,24 +231,31 @@ def arima_forecast():
         result = arima_service.model.forecast(steps=steps)
 
         predictions_log = result['predictions'].values        # log-return space
-        conf_int        = result['confidence_intervals']      # DataFrame with 2 cols
-        lower_log       = conf_int.iloc[:, 0].values
-        upper_log       = conf_int.iloc[:, 1].values
+        std_errors       = result['std_errors'].values        # usually finite
 
-        # Convert log-returns → cumulative price levels
+        # Fallback SE: use mean absolute log-return as a rough proxy when SE is NaN/0
+        finite_ses = std_errors[np.isfinite(std_errors) & (std_errors > 0)]
+        fallback_se = float(np.mean(finite_ses)) if len(finite_ses) > 0 else 0.005
+
+        # Convert log-returns → cumulative price levels (walk-forward)
         last_price = arima_service.last_price
-        price_preds  = []
-        price_lower  = []
-        price_upper  = []
+        price_preds, price_lower, price_upper = [], [], []
         current = last_price
-        for i in range(steps):
-            current = current * np.exp(predictions_log[i])
-            cl = (current / np.exp(predictions_log[i])) * np.exp(lower_log[i])
-            cu = (current / np.exp(predictions_log[i])) * np.exp(upper_log[i])
-            price_preds.append(float(current))
-            price_lower.append(float(cl))
-            price_upper.append(float(cu))
 
+        for i in range(steps):
+            lr = float(predictions_log[i]) if np.isfinite(predictions_log[i]) else 0.0
+            se = float(std_errors[i])      if (np.isfinite(std_errors[i]) and std_errors[i] > 0) else fallback_se
+
+            prev = current
+            current = prev * np.exp(lr)
+
+            # Log-normal CI anchored to the price level BEFORE this step's move
+            cl = prev * np.exp(lr - 1.96 * se)
+            cu = prev * np.exp(lr + 1.96 * se)
+
+            price_preds.append(round(float(current), 8))
+            price_lower.append(round(float(cl),      8))
+            price_upper.append(round(float(cu),      8))
         return jsonify(clean_for_json({
             "steps": steps,
             "last_price": last_price,
