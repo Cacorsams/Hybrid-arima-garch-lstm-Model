@@ -274,7 +274,7 @@ export default function DocumentationPage() {
                 <p className="text-xs text-zinc-500 mt-4 italic">*Metadata from 1,000 recursive training iterations on 2015–2024 CBA dataset.</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { title: 'Phase A: Ingestion', desc: 'Cleaning & stationarity derivation using ADF tests.', detail: 'Determines d parameter.', icon: Database },
                 { title: 'Phase B: Linear', desc: 'ARIMA Grid Search (AIC/BIC minimization).', detail: 'Extracts linear lags.', icon: Activity },
@@ -429,7 +429,7 @@ L = Lag operator (L Y_t = Y_{t-1})
                 </p>
                 <div>
                   <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider mb-4">Neural Architecture Details</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
                       { label: 'Layer Depth', val: '2-Layer Stacked', desc: 'Adds hierarchical abstraction to the pattern learning.' },
                       { label: 'Unit Count', val: '50-25 Neurons', desc: 'Optimized via hyperband tuning to prevent latent noise memorization.' },
@@ -478,7 +478,7 @@ L = Lag operator (L Y_t = Y_{t-1})
                   ))}
                   <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700">
                     <h5 className="text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 mb-3">Optimizer Settings</h5>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                       {['Alpha: 0.001', 'Beta_1: 0.9', 'Epsilon: 1e-07', 'Clip: 1.0'].map((line, i) => (
                         <div key={i} className="flex justify-between">
                           <span className="text-zinc-500">{line.split(': ')[0]}:</span>
@@ -597,7 +597,7 @@ L = Lag operator (L Y_t = Y_{t-1})
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
                 To provide a responsive experience, the frontend never waits for the model to finish. Instead, it subscribes to the <code className="px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-xs font-mono">forecast_updates</code> table in Supabase.
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { title: 'Listener', desc: 'React useEffect hooks monitor real-time channel.', icon: Activity },
                   { title: 'Buffer', desc: 'Incoming signals are stored in a local state buffer.', icon: Database },
@@ -625,8 +625,8 @@ L = Lag operator (L Y_t = Y_{t-1})
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   Quantitative validation is performed across four separate error domains. We don&apos;t just measure &quot;accuracy&quot;; we measure <strong className="text-zinc-800 dark:text-zinc-200">Forecast Robustness</strong>. The goal is to minimize not just the average error, but the probability of systemic catastrophic failure (Fat Tails).
                 </p>
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[500px]">
                     <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                       <tr>
                         <th className="text-left px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">Metric Class</th>
@@ -667,7 +667,7 @@ L = Lag operator (L Y_t = Y_{t-1})
                   <p className="text-sm opacity-90 leading-relaxed mb-6">
                     &quot;We rigorously tested the hybrid architecture against its component parts. The null hypothesis (that the hybrid model is no better than simple ARIMA) was rejected with a Confidence Interval of 97.6%.&quot;
                   </p>
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/20">
                     <div>
                       <p className="text-[10px] uppercase font-medium opacity-80">P-Value Score</p>
                       <p className="text-2xl font-semibold tabular-nums">0.0241</p>
@@ -961,8 +961,8 @@ L = Lag operator (L Y_t = Y_{t-1})
               </div>
               <div>
                 <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider mb-3">Full Parameter Grid</h3>
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[400px]">
                     <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                       <tr>
                         <th className="text-left px-4 py-3 font-semibold text-zinc-900 dark:text-zinc-100">Component</th>
@@ -1060,8 +1060,8 @@ L = Lag operator (L Y_t = Y_{t-1})
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
                 <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-3">LSTM Layer Configuration</h4>
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[400px]">
                     <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                       <tr>
                         <th className="text-left px-4 py-2 font-semibold text-zinc-900 dark:text-zinc-100">Parameter</th>
@@ -1084,8 +1084,8 @@ L = Lag operator (L Y_t = Y_{t-1})
               </div>
               <div>
                 <h4 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Optimization Strategy</h4>
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-x-auto">
+                  <table className="w-full text-sm min-w-[400px]">
                     <thead className="bg-zinc-50 dark:bg-zinc-800/50">
                       <tr>
                         <th className="text-left px-4 py-2 font-semibold text-zinc-900 dark:text-zinc-100">Metric</th>

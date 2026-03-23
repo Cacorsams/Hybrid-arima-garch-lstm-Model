@@ -26,18 +26,49 @@ from data_collection import ForexDataCollector, supabase as sb
 # ---------------------------------------------------------------------------
 # Supabase persistence helper
 # ---------------------------------------------------------------------------
-def _upsert(table: str, rows: list):
-    """Batch-upsert rows into a Supabase table, ignoring errors."""
+def _persist(table: str, rows: list):
+    """Batch-insert rows into a Supabase table with robust error handling and sanitization."""
     if not rows:
         return
     try:
+        def clamp(val, precision, scale):
+            if val is None: return None
+            max_val = 10**(precision - scale) - 10**(-scale)
+            if val > max_val: return max_val
+            if val < -max_val: return -max_val
+            return val
+
+        # Pre-clean rows to ensure JSON serializability and fit constraints
+        clean_rows = []
+        for row in rows:
+            clean_row = {}
+            for k, v in row.items():
+                if hasattr(v, 'item'): # numpy scalar
+                    val = v.item()
+                elif isinstance(v, (np.float64, np.float32, np.float16)):
+                    val = float(v)
+                elif isinstance(v, (np.int64, np.int32, np.int16)):
+                    val = int(v)
+                elif pd.isna(v):
+                    val = None
+                else:
+                    val = v
+                
+                # Apply clamping for known sensitive fields
+                if k in ['mae', 'rmse', 'mape', 'conditional_variance', 'conditional_std', 'standardized_residuals']:
+                    val = clamp(val, 12, 8)
+                elif k in ['predicted_rate', 'actual_rate', 'confidence_interval_lower', 'confidence_interval_upper', 'combined_prediction', 'confidence_lower', 'confidence_upper']:
+                    val = clamp(val, 10, 6)
+                
+                clean_row[k] = val
+            clean_rows.append(clean_row)
+
         batch_size = 100
-        for i in range(0, len(rows), batch_size):
-            sb.table(table).upsert(rows[i:i+batch_size]).execute()
-        print(f"✓ Saved {len(rows)} rows to {table}")
+        for i in range(0, len(clean_rows), batch_size):
+            sb.table(table).insert(clean_rows[i:i+batch_size]).execute()
+        print(f"✓ Persisted {len(clean_rows)} rows to {table}")
     except Exception as e:
-        # Persistence failures must not crash the API response
-        print(f"✗ Supabase upsert error ({table}): {e}")
+        print(f"✗ Supabase persistence error ({table}): {e}")
 
 # ---------------------------------------------------------------------------
 # Standalone ARIMA state (independent from the hybrid pipeline)
@@ -286,7 +317,7 @@ def arima_train():
                     "mape":                       round(float(metrics_res['mape']), 8),
                     "arima_order":                str(arima_service.model.order),
                 })
-            _upsert("arima_predictions", rows)
+            _persist("arima_predictions", rows)
         except Exception as db_err:
             print(f"ARIMA Supabase insert skipped: {db_err}")
 
@@ -338,6 +369,25 @@ def arima_forecast():
             price_preds.append(round(float(current), 8))
             price_lower.append(round(float(cl),      8))
             price_upper.append(round(float(cu),      8))
+
+        # --- Persist this forecast run ---
+        try:
+            from datetime import date, timedelta
+            rows = []
+            for i in range(steps):
+                fdate = (date.today() + timedelta(days=i+1)).isoformat()
+                rows.append({
+                    "forecast_date": fdate,
+                    "predicted_return": round(float(predictions_log[i]), 8),
+                    "predicted_rate": price_preds[i],
+                    "confidence_interval_lower": price_lower[i],
+                    "confidence_interval_upper": price_upper[i],
+                    "arima_order": str(arima_service.model.order)
+                })
+            _persist("arima_predictions", rows)
+        except Exception as db_err:
+            print(f"ARIMA Forecast Persist Error: {db_err}")
+
         return jsonify(clean_for_json({
             "steps": steps,
             "last_price": last_price,
@@ -447,7 +497,7 @@ def garch_train():
                     "standardized_residuals": round(sr,  8) if sr   is not None else None,
                     "garch_order":            order_tag,
                 })
-            _upsert("garch_volatility", rows)
+            _persist("garch_volatility", rows)
         except Exception as db_err:
             print(f"GARCH Supabase insert skipped: {db_err}")
 
@@ -476,6 +526,22 @@ def garch_forecast():
         # variance is an array of length `horizon`
         predicted_variance = result['variance']
         predicted_volatility = result['std']
+
+        # --- Persist GARCH forecast ---
+        try:
+            from datetime import date, timedelta
+            rows = []
+            for i in range(steps):
+                fdate = (date.today() + timedelta(days=i+1)).isoformat()
+                rows.append({
+                    "date": fdate,
+                    "conditional_variance": round(float(predicted_variance[i]), 8),
+                    "conditional_std": round(float(predicted_volatility[i]), 8),
+                    "garch_order": f"GARCH({garch_service.model.p},{garch_service.model.q})"
+                })
+            _persist("garch_volatility", rows)
+        except Exception as db_err:
+            print(f"GARCH Forecast Persist Error: {db_err}")
 
         return jsonify(clean_for_json({
             "steps": steps,
@@ -587,7 +653,7 @@ def lstm_train():
                     "predicted_rate":   round(float(current), 6),
                     "model_epoch":      epochs_run,
                 })
-            _upsert("lstm_predictions", rows)
+            _persist("lstm_predictions", rows)
         except Exception as db_err:
             print(f"LSTM Supabase insert skipped: {db_err}")
 
@@ -623,9 +689,6 @@ def lstm_forecast():
         for _ in range(steps):
             # predict 1 step ahead
             seq_arr = np.array(current_sequence[-lookback:])
-            # The predictor automatically scales the input internaly, but it expects a full array to scale properly?
-            # Actually, `predictor.predict` currently calls `scaler.transform`. It's fine to pass the whole sequence or just the back window.
-            # `predict(data)` in lstm_model.py expects an array, transforms it, and uses the last `lookback` elements.
             next_log_return = lstm_service.model.predict(seq_arr)
             predicted_log_returns.append(next_log_return)
             current_sequence.append(next_log_return)
@@ -639,8 +702,23 @@ def lstm_forecast():
             current = current * np.exp(lr)
             price_preds.append(float(current))
 
-        # Note: LSTM doesn't natively give a statistical confidence interval without bayesian dropout or similar.
-        # We will return the predictions, frontend can omit the CI band.
+        # --- Persist LSTM forecast ---
+        try:
+            from datetime import date, timedelta
+            rows = []
+            for i in range(steps):
+                fdate = (date.today() + timedelta(days=i+1)).isoformat()
+                rows.append({
+                    "forecast_date": fdate,
+                    "predicted_return": round(float(predicted_log_returns[i]), 8),
+                    "predicted_rate": round(float(price_preds[i]), 6),
+                    # Accessing epochs from history if possible
+                    "model_epoch": int(lstm_service.model.history.params['epochs']) if (hasattr(lstm_service.model.history, 'params') and 'epochs' in lstm_service.model.history.params) else 30
+                })
+            _persist("lstm_predictions", rows)
+        except Exception as db_err:
+            print(f"LSTM Forecast Persist Error: {db_err}")
+
         return jsonify(clean_for_json({
             "steps": steps,
             "last_price": last_price,

@@ -98,7 +98,7 @@ export default function ProjectPage() {
             </li>
             <li>
               <Link
-                href="/system/hybrid"
+                href="/system/Dashboard"
                 className="hover:text-[#1a1a1a] dark:hover:text-white transition-colors duration-200"
               >
                 Dashboard
@@ -163,7 +163,7 @@ export default function ProjectPage() {
                 </Link>
               </li>
               <li>
-                <Link href="/system/hybrid" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/system/Dashboard" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </Link>
               </li>
@@ -268,23 +268,24 @@ export default function ProjectPage() {
           </div>
         </div>
 
-        {/* Slider Track */}
-        <div
-          className="flex gap-6 md:gap-8 transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
-          style={{
-            transform: `translateX(-${currentIndex * (100 / teamMembers.length)}%)`,
-            width: `${(teamMembers.length / 4) * 100}%`
-          }}
-        >
-          {teamMembers.map((member, idx) => {
-            const styleIdx = idx % 4;
-
-            return (
-              <div
-                key={idx}
-                className="w-1/4 flex-shrink-0 group relative block overflow-hidden rounded-xl aspect-[3/4] bg-[#e8e3dd] cursor-pointer"
-                style={{ width: `${100 / teamMembers.length}%` }}
-              >
+        {/* Slider Track Wrapper with Negative Margins to offset padding */}
+        <div className="-mx-3 md:-mx-4">
+          {/* Slider Track */}
+          <div
+            className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+            style={{
+              transform: `translateX(-${currentIndex * (100 / teamMembers.length)}%)`,
+              width: `${(teamMembers.length / 4) * 100}%`
+            }}
+          >
+            {teamMembers.map((member, idx) => {
+              return (
+                <div
+                  key={idx}
+                  className="flex-shrink-0 px-3 md:px-4"
+                  style={{ width: `${100 / teamMembers.length}%` }}
+                >
+                  <div className="w-full h-full group relative block overflow-hidden rounded-xl aspect-[3/4] bg-[#e8e3dd] cursor-pointer">
                 {/* Background Graphics (Preserving Velisse Brand) */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 z-10" />
 
@@ -295,41 +296,7 @@ export default function ProjectPage() {
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
 
-                {/* Abstract Graphics Overlay */}
-                <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-                  {styleIdx === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center scale-75">
-                      <div className="w-32 h-40 bg-[#c9b896] rounded-sm shadow-lg transform rotate-[-3deg]" />
-                      <div className="w-32 h-40 bg-[#d4cfc7] rounded-sm shadow-md transform rotate-[5deg] -ml-12" />
-                    </div>
-                  )}
-                  {styleIdx === 1 && (
-                    <div className="absolute inset-0 flex items-center justify-center scale-75">
-                      <div className="w-48 h-48 rounded-full border-[12px] border-[#c4bfb8] flex items-center justify-center">
-                        <div className="w-20 h-28 bg-[#d94040] rounded-sm transform rotate-[2deg]" />
-                      </div>
-                    </div>
-                  )}
-                  {styleIdx === 2 && (
-                    <div className="absolute inset-0 flex items-center justify-center scale-75">
-                      <div className="grid grid-cols-2 gap-3 transform rotate-[-2deg]">
-                        <div className="w-24 h-16 bg-[#b8b2aa] rounded-sm" />
-                        <div className="w-24 h-16 bg-[#a09a92] rounded-sm" />
-                        <div className="w-24 h-16 bg-[#a09a92] rounded-sm" />
-                        <div className="w-24 h-16 bg-[#b8b2aa] rounded-sm" />
-                      </div>
-                    </div>
-                  )}
-                  {styleIdx === 3 && (
-                    <div className="absolute inset-0 flex items-center justify-center scale-75">
-                      <div className="flex items-end gap-4">
-                        <div className="w-12 h-24 bg-[#1a1a1a] rounded-t-full" />
-                        <div className="w-12 h-32 bg-[#3a3a3a] rounded-t-full" />
-                        <div className="w-12 h-20 bg-[#555] rounded-t-full" />
-                      </div>
-                    </div>
-                  )}
-                </div>
+
 
                 {/* Name Label */}
                 <div className="absolute top-5 left-5 z-20">
@@ -348,9 +315,11 @@ export default function ProjectPage() {
                   </p>
                   <div className="w-8 h-1 bg-[#1a1a1a] dark:bg-white rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 delay-300" />
                 </div>
-              </div>
-            );
-          })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -433,7 +402,7 @@ export default function ProjectPage() {
                 </li>
                 <li>
                   <Link
-                    href="/system/hybrid"
+                    href="/system/Dashboard"
                     className="text-[#888] text-sm hover:text-white transition-colors duration-200"
                   >
                     Dashboard
