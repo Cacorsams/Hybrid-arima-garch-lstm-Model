@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import {
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   LineChart,
@@ -15,7 +17,7 @@ import {
   ReferenceLine,
   Legend,
 } from 'recharts';
-import { ChevronDown, Monitor, Share, HelpCircle, Settings } from 'lucide-react';
+import { ChevronDown, Monitor, Share, HelpCircle, Settings, Download, Copy, X, Check, Maximize, Minimize } from 'lucide-react';
 
 // --- STYLES & COLORS ---
 const colors = {
@@ -34,24 +36,27 @@ const colors = {
 // --- CUSTOM COMPONENTS ---
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
-    const bouncePayload = payload.find((p: any) => p.dataKey === 'volatility');
-    if (bouncePayload) {
-      return (
-        <div className="bg-white text-black p-2 rounded shadow-lg text-xs font-bold border border-gray-200">
-          <div className="text-gray-500 font-normal mb-1">Volatility</div>
-          <div className="text-gray-400 font-normal">{label}</div>
-          <div className="text-lg">{bouncePayload.value?.toFixed(5)}</div>
-        </div>
-      );
-    }
     return (
-      <div className="bg-popover border border-border p-2 rounded text-xs text-popover-foreground">
-        <p>{`${label}`}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color }}>
-            {entry.name}: {typeof entry.value === 'number' ? entry.value.toFixed(5) : entry.value}
-          </p>
-        ))}
+      <div className="backdrop-blur-xl bg-zinc-900/80 border border-white/10 p-4 rounded-xl shadow-2xl text-[11px] text-white min-w-[180px] ring-1 ring-white/5">
+        <div className="flex items-center justify-between mb-2 border-b border-white/10 pb-2">
+          <span className="text-zinc-400 font-bold tracking-widest uppercase">{label}</span>
+          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+        </div>
+        <div className="space-y-2">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex justify-between items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-3 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
+                <span className="text-zinc-400 font-medium">{entry.name}</span>
+              </div>
+              <span className="font-mono font-bold text-zinc-100">
+                {typeof entry.value === 'number' 
+                  ? entry.value > 1 ? entry.value.toFixed(5) : entry.value.toFixed(6)
+                  : entry.value}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -84,33 +89,33 @@ const MetricCard = ({
   subValue?: string;
   subLabel?: string;
 }) => (
-  <div className="flex flex-col h-full">
-    <div className="mb-1">
-      <h3 className="text-zinc-500 text-[10px] font-bold tracking-wider uppercase">
+  <div className="flex flex-col h-full bg-white/5 border border-white/5 rounded-2xl p-4 transition-all duration-300 hover:bg-white/[0.08] group">
+    <div className="mb-2">
+      <h3 className="text-zinc-500 text-[9px] font-bold tracking-[0.2em] uppercase opacity-70 group-hover:opacity-100 transition-opacity">
         {title}
       </h3>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold" style={{ color }}>
+      <div className="flex items-baseline gap-2 mt-1">
+        <span className="text-2xl font-bold tracking-tight" style={{ color }}>
           {value}
         </span>
       </div>
     </div>
-    <div className="flex-grow min-h-[40px] mt-2 relative">
+    <div className="flex-grow min-h-[50px] mt-2 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <Line
             type="monotone"
             dataKey="val"
             stroke={color}
-            strokeWidth={2}
+            strokeWidth={2.5}
             dot={false}
-            isAnimationActive={false}
+            isAnimationActive={true}
           />
         </LineChart>
       </ResponsiveContainer>
       {subValue && (
-        <div className="absolute bottom-0 left-0 text-[10px]" style={{ color }}>
-          {subValue} <span className="text-zinc-500">{subLabel}</span>
+        <div className="absolute -bottom-1 left-0 text-[10px] font-medium" style={{ color }}>
+          <span className="opacity-90">{subValue}</span> <span className="text-zinc-600 font-normal lowercase">{subLabel}</span>
         </div>
       )}
     </div>
@@ -134,6 +139,43 @@ export default function AnalyticsDashboard() {
   const [sparklines, setSparklines] = useState<any[][]>([[], [], [], [], [], []]);
 
   const [loading, setLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  // --- ACTIONS ---
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const exportToCSV = (data: any[], filename: string) => {
+    if (!data.length) return;
+    const headers = Object.keys(data[0]).join(',');
+    const rows = data.map(obj => Object.values(obj).join(',')).join('\n');
+    const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + rows;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${filename}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -193,10 +235,9 @@ export default function AnalyticsDashboard() {
             arimaMedianPrice = arimaData.predictions[0] || 0;
             const chartPoints = arimaData.predictions.map((pred: number, i: number) => ({
               x: `T+${i + 1}`,
-              load: Math.round(pred * 10000), // scale for bar chart visual
-              volatility: arimaData.confidence_uppers?.[i]
-                ? ((arimaData.confidence_uppers[i] - arimaData.confidence_lowers[i]) / 2 * 100)
-                : 0,
+              prediction: pred,
+              upper: arimaData.confidence_uppers?.[i] || pred,
+              lower: arimaData.confidence_lowers?.[i] || pred,
             }));
             setArimaChartData(chartPoints);
             // Sparkline from ARIMA predictions
@@ -227,7 +268,9 @@ export default function AnalyticsDashboard() {
           if (lstmData?.predictions && Array.isArray(lstmData.predictions)) {
             const chartPoints = lstmData.predictions.map((pred: number, i: number) => ({
               x: `T+${i + 1}`,
-              load: Math.round(pred * 10000),
+              prediction: pred,
+              upper: pred,
+              lower: pred,
               volatility: 0,
             }));
 
@@ -236,7 +279,11 @@ export default function AnalyticsDashboard() {
               const garchData = await garchForecastRes.value.json();
               if (garchData?.forecast_volatility) {
                 chartPoints.forEach((pt: any, i: number) => {
-                  pt.volatility = (garchData.forecast_volatility[i] || 0) * 10000;
+                  const vol = garchData.forecast_volatility[i] || 0;
+                  pt.volatility = vol;
+                  // Use 1.96 standard deviations for a 95% confidence band
+                  pt.upper = pt.prediction + (vol * 1.96);
+                  pt.lower = pt.prediction - (vol * 1.96);
                 });
               }
             }
@@ -296,10 +343,39 @@ export default function AnalyticsDashboard() {
             size={20}
           />
         </div>
-        <div className="flex items-center gap-4 text-zinc-500">
-          <Monitor className="hover:text-foreground cursor-pointer transition-colors" size={18} />
-          <Share className="hover:text-foreground cursor-pointer transition-colors" size={18} />
-          <HelpCircle className="hover:text-foreground cursor-pointer transition-colors" size={18} />
+        <div className="flex items-center gap-4 text-zinc-500 relative">
+          <button 
+            onClick={toggleFullscreen}
+            className="hover:text-foreground p-1 transition-colors relative group"
+            title="Toggle Fullscreen"
+          >
+            {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              {isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            </span>
+          </button>
+          
+          <button 
+            onClick={() => setShowShareModal(true)}
+            className="hover:text-foreground p-1 transition-colors relative group"
+            title="Share or Export"
+          >
+            <Share size={18} />
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Share / Export
+            </span>
+          </button>
+
+          <button 
+            onClick={() => setShowHelpModal(true)}
+            className="hover:text-foreground p-1 transition-colors relative group"
+            title="Help & Info"
+          >
+            <HelpCircle size={18} />
+            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Help Guide
+            </span>
+          </button>
         </div>
       </header>
 
@@ -307,193 +383,297 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
         {/* TOP LEFT: ARIMA Forecast vs CI Width */}
-        <div className="flex flex-col h-[350px] bg-card rounded-xl p-5 border border-border">
+        <div className="flex flex-col h-[400px] bg-card rounded-xl p-5 border border-border relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
           <PanelHeader title="ARIMA FORECAST VS CONFIDENCE INTERVAL" />
-          <div className="flex-grow relative">
+          <div className="flex-grow relative mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
                 data={arimaChartData}
-                margin={{ top: 20, right: 0, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid stroke={colors.gridLine} vertical={false} />
+                <defs>
+                  <linearGradient id="colorPrediction" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.cyan} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={colors.cyan} stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorCI" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.magenta} stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor={colors.magenta} stopOpacity={0.02}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={colors.gridLine} vertical={false} strokeDasharray="3 3" opacity={0.5} />
                 <XAxis
                   dataKey="x"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
-                  axisLine={{ stroke: colors.gridLine }}
+                  tick={{ fill: colors.textMuted, fontSize: 10, fontWeight: 500 }}
+                  axisLine={{ stroke: colors.gridLine, opacity: 0.5 }}
                   tickLine={false}
                   dy={10}
                   interval={4}
                 />
                 <YAxis
-                  yAxisId="left"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
+                  tick={{ fill: colors.textMuted, fontSize: 10, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(val) => val >= 1000 ? `${(val / 10000).toFixed(3)}` : val}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(val) => val.toFixed(4)}
                 />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(val) => `${(val / 100).toFixed(3)}`}
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  cursor={{ stroke: colors.cyan, strokeWidth: 1, strokeDasharray: '5 5' }} 
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-                <Bar yAxisId="left" dataKey="load" name="Predicted Rate (×10k)" fill={colors.cyan} barSize={12} radius={[2, 2, 0, 0]} />
-                <Line
-                  yAxisId="right"
+                
+                {/* Confidence Interval Area */}
+                <Area
                   type="monotone"
-                  dataKey="volatility"
-                  name="CI Width"
-                  stroke={colors.magenta}
-                  strokeWidth={2}
-                  dot={false}
+                  dataKey="upper"
+                  stroke="none"
+                  fill="url(#colorCI)"
+                  fillOpacity={1}
+                  connectNulls
+                  isAnimationActive={true}
                 />
+                <Area
+                  type="monotone"
+                  dataKey="lower"
+                  stroke="none"
+                  fill={colors.bg}
+                  fillOpacity={1}
+                  connectNulls
+                  isAnimationActive={true}
+                />
+                
+                {/* Prediction Line & Area */}
+                <Area
+                  type="monotone"
+                  dataKey="prediction"
+                  name="Predicted Rate"
+                  stroke={colors.cyan}
+                  strokeWidth={3}
+                  fill="url(#colorPrediction)"
+                  fillOpacity={1}
+                  dot={{ r: 0, fill: colors.cyan, strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 6, strokeWidth: 0, fill: colors.cyan }}
+                />
+                
                 {arimaChartData.length > 0 && (
-                  <ReferenceLine yAxisId="left" x="T+1" stroke={colors.cyan} strokeDasharray="3 3" />
+                  <ReferenceLine x="T+1" stroke={colors.cyan} strokeDasharray="5 5" opacity={0.5} />
                 )}
-                <text x="15%" y="10%" fill={colors.cyan} fontSize={10} className="hidden sm:block">
-                  {arimaMetrics ? `ARIMA${arimaMetrics.order ? `(${arimaMetrics.order.join(',')})` : ''} | MAE: ${fmt(arimaMetrics.mae, 6)}` : loading ? 'Loading…' : 'Data unavailable'}
+                
+                <text x="50%" y="5%" textAnchor="middle" fill={colors.textMuted} fontSize={10} className="font-medium tracking-widest opacity-80 uppercase">
+                  {arimaMetrics ? `ARIMA${arimaMetrics.order ? `(${arimaMetrics.order.join(',')})` : ''} | MAE: ${fmt(arimaMetrics.mae, 6)}` : loading ? 'PROcessing ARIMA data…' : ''}
                 </text>
               </ComposedChart>
             </ResponsiveContainer>
-            <div className="absolute bottom-[-20px] w-full flex justify-center gap-6 text-[10px] text-zinc-500">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-[#00e5ff]"></div> Predicted Rate
+            <div className="absolute bottom-[-10px] w-full flex justify-center gap-8 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]"></div>
+                <span>Prediction</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-4 h-[2px] bg-[#ff4081]"></div> CI Width
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-magenta-500/20 border border-magenta-500/40"></div>
+                <span>95% Confidence Band</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* TOP RIGHT: LSTM Forecast vs GARCH Volatility */}
-        <div className="flex flex-col h-[350px] bg-card rounded-xl p-5 border border-border">
+        <div className="flex flex-col h-[400px] bg-card rounded-xl p-5 border border-border relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
           <PanelHeader title="LSTM FORECAST VS GARCH VOLATILITY" />
-          <div className="flex-grow relative">
+          <div className="flex-grow relative mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
                 data={lstmChartData}
-                margin={{ top: 20, right: 0, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid stroke={colors.gridLine} vertical={false} />
+                <defs>
+                  <linearGradient id="colorLstm" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.green} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={colors.green} stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorGarch" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.magenta} stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor={colors.magenta} stopOpacity={0.02}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={colors.gridLine} vertical={false} strokeDasharray="3 3" opacity={0.5} />
                 <XAxis
                   dataKey="x"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
-                  axisLine={{ stroke: colors.gridLine }}
+                  tick={{ fill: colors.textMuted, fontSize: 10, fontWeight: 500 }}
+                  axisLine={{ stroke: colors.gridLine, opacity: 0.5 }}
                   tickLine={false}
                   dy={10}
                   interval={4}
                 />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
+                  tick={{ fill: colors.textMuted, fontSize: 10, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(val) => `${(val / 10000).toFixed(3)}`}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(val) => val.toFixed(4)}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fill: colors.textMuted, fontSize: 10 }}
+                  tick={{ fill: colors.magenta, fontSize: 10, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(val) => `${(val / 10000).toFixed(4)}`}
+                  tickFormatter={(val) => val.toFixed(5)}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-                <Bar yAxisId="left" dataKey="load" name="LSTM Rate (×10k)" fill={colors.cyan} barSize={12} radius={[2, 2, 0, 0]} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  cursor={{ stroke: colors.green, strokeWidth: 1, strokeDasharray: '5 5' }} 
+                />
+                
+                {/* GARCH Volatility Band */}
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="upper"
+                  stroke="none"
+                  fill="url(#colorGarch)"
+                  fillOpacity={1}
+                  connectNulls
+                />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="lower"
+                  stroke="none"
+                  fill={colors.bg}
+                  fillOpacity={1}
+                  connectNulls
+                />
+                
+                {/* LSTM Prediction */}
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="prediction"
+                  name="LSTM Rate"
+                  stroke={colors.green}
+                  strokeWidth={3}
+                  fill="url(#colorLstm)"
+                  fillOpacity={1}
+                  dot={false}
+                  activeDot={{ r: 6, strokeWidth: 0, fill: colors.green }}
+                />
+                
+                {/* GARCH Volatility Line */}
                 <Line
                   yAxisId="right"
-                  type="monotone"
+                  type="stepAfter"
                   dataKey="volatility"
-                  name="GARCH Vol (×10k)"
+                  name="GARCH Volatility"
                   stroke={colors.magenta}
                   strokeWidth={2}
+                  strokeDasharray="3 3"
                   dot={false}
+                  opacity={0.7}
                 />
+                
                 {lstmChartData.length > 0 && (
-                  <ReferenceLine yAxisId="left" x="T+1" stroke={colors.cyan} strokeDasharray="3 3" />
+                  <ReferenceLine yAxisId="left" x="T+1" stroke={colors.green} strokeDasharray="5 5" opacity={0.5} />
                 )}
-                <text x="30%" y="10%" fill={colors.cyan} fontSize={10} className="hidden sm:block">
-                  {lstmMetrics ? `Epochs: ${lstmMetrics.epochs} | Final Loss: ${fmt(lstmMetrics.final_loss, 6)}` : loading ? 'Loading…' : 'Data unavailable'}
+                
+                <text x="50%" y="5%" textAnchor="middle" fill={colors.textMuted} fontSize={10} className="font-medium tracking-widest opacity-80 uppercase">
+                  {lstmMetrics ? `Epochs: ${lstmMetrics.epochs} | Final Loss: ${fmt(lstmMetrics.final_loss, 6)}` : loading ? 'PROcessing LSTM data…' : ''}
                 </text>
               </ComposedChart>
             </ResponsiveContainer>
-            <div className="absolute bottom-[-20px] w-full flex justify-center gap-6 text-[10px] text-zinc-500">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-[#00e5ff]"></div> LSTM Rate
+            <div className="absolute bottom-[-10px] w-full flex justify-center gap-8 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                <span>LSTM Rate</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-4 h-[2px] bg-[#ff4081]"></div> GARCH Volatility
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-[2px] bg-magenta-500 shadow-[0_0_8px_rgba(255,64,129,0.5)]"></div>
+                <span>GARCH Volatility</span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* BOTTOM LEFT: Historical Close vs Log Return */}
-        <div className="flex flex-col h-[350px] bg-card rounded-xl p-5 border border-border mt-8 lg:mt-0">
+                {/* BOTTOM LEFT: Historical Close vs Log Return */}
+        <div className="flex flex-col h-[400px] bg-card rounded-xl p-6 border border-border relative overflow-hidden group mt-8 lg:mt-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
           <PanelHeader title="HISTORICAL EXCHANGE RATE VS LOG RETURN" />
-
+ 
           {/* Stat Chips Header */}
-          <div className="flex justify-between mb-4 border-b border-border pb-2">
-            <div>
-              <div className="text-[#00e5ff] text-xs mb-1">Latest KES/CAD</div>
-              <div className="text-[#00e5ff] text-2xl font-bold">
+          <div className="grid grid-cols-3 gap-4 mb-6 pt-2">
+            <div className="bg-white/5 border border-white/5 p-3 rounded-xl">
+              <div className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-1">Latest KES/CAD</div>
+              <div className="text-[#00e5ff] text-2xl font-bold tracking-tight">
                 {historyStats ? fmt(historyStats.latestClose, 5) : '—'}
               </div>
             </div>
-            <div>
-              <div className="text-[#ff4081] text-xs mb-1">Data Points</div>
-              <div className="text-[#ff4081] text-2xl font-bold">
+            <div className="bg-white/5 border border-white/5 p-3 rounded-xl">
+              <div className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-1">Data Points</div>
+              <div className="text-[#ff4081] text-2xl font-bold tracking-tight">
                 {historyStats ? `${historyStats.dataPoints}` : '—'}
               </div>
             </div>
-            <div>
-              <div className="text-white text-xs mb-1">Avg Log Return</div>
-              <div className="text-white text-2xl font-bold">
+            <div className="bg-white/10 border border-white/10 p-3 rounded-xl shadow-inner group/stat">
+              <div className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase mb-1 opacity-80">Avg Log Return</div>
+              <div className="text-zinc-100 text-2xl font-bold tracking-tight flex items-center gap-2">
+                <div className="w-1 h-4 bg-white/20 rounded-full" />
                 {historyStats ? fmtPct(historyStats.avgReturn) : '—'}
               </div>
             </div>
           </div>
-
+ 
           <div className="flex-grow relative">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
+              <ComposedChart
                 data={historyChartData}
-                margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid stroke={colors.gridLine} vertical={false} />
+                <defs>
+                  <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.cyan} stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor={colors.cyan} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={colors.gridLine} vertical={false} strokeDasharray="3 3" opacity={0.5} />
                 <XAxis dataKey="time" hide />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fill: colors.cyan, fontSize: 10 }}
+                  tick={{ fill: colors.textMuted, fontSize: 10, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(val) => `${val.toFixed(4)}`}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(val) => val.toFixed(4)}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fill: colors.magenta, fontSize: 10 }}
+                  tick={{ fill: colors.magenta, fontSize: 10, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `${(val * 100).toFixed(2)}%`}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111122', borderColor: '#1e1e3f' }}
-                  itemStyle={{ fontSize: 12 }}
-                  labelStyle={{ display: 'none' }}
+                  content={<CustomTooltip />}
+                  cursor={{ stroke: colors.cyan, strokeWidth: 1, strokeDasharray: '5 5' }}
+                />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="close"
+                  stroke="none"
+                  fill="url(#colorClose)"
                 />
                 <Line
                   yAxisId="left"
                   type="monotone"
                   dataKey="close"
-                  name="Close"
+                  name="Close Rate"
                   stroke={colors.cyan}
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   dot={false}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: colors.cyan }}
                 />
                 <Line
                   yAxisId="right"
@@ -501,19 +681,21 @@ export default function AnalyticsDashboard() {
                   dataKey="logReturn"
                   name="Log Return"
                   stroke={colors.magenta}
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   dot={false}
+                  opacity={0.8}
                 />
-              </LineChart>
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* BOTTOM RIGHT: Model KPIs Grid */}
-        <div className="flex flex-col h-[350px] bg-card rounded-xl p-5 border border-border mt-8 lg:mt-0">
+        <div className="flex flex-col h-[400px] bg-card rounded-xl p-6 border border-border relative overflow-hidden group mt-8 lg:mt-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
           <PanelHeader title="MODEL KPIs" />
-
-          <div className="grid grid-cols-3 grid-rows-2 gap-x-4 gap-y-8 h-full pt-2">
+ 
+          <div className="grid grid-cols-3 grid-rows-2 gap-4 h-full pt-2">
             {/* Row 1 */}
             <MetricCard
               title="ARIMA MAE"
@@ -559,6 +741,106 @@ export default function AnalyticsDashboard() {
           </div>
         </div>
       </div>
+      {/* HELP MODAL */}
+      {showHelpModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowHelpModal(false)} />
+          <div className="relative bg-zinc-900 border border-white/10 rounded-2xl p-8 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setShowHelpModal(false)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-3">
+              <HelpCircle className="text-cyan-400" /> Dashboard Guide
+            </h2>
+            <div className="space-y-6 text-zinc-400 text-sm leading-relaxed overflow-y-auto max-h-[60vh] pr-4">
+              <section>
+                <h3 className="text-white font-semibold mb-2">ARIMA-GARCH-LSTM Sequential Hybrid</h3>
+                <p>This dashboard visualizes a three-stage forecasting model. First, **ARIMA** captures linear trends. Second, **GARCH** models the volatility clustering in the residuals. Third, **LSTM** learns complex non-linear patterns from the remaining variance.</p>
+              </section>
+              <section>
+                <h3 className="text-white font-semibold mb-2">Confidence Bands</h3>
+                <p>The shaded areas in the charts represent the statistical uncertainty. For ARIMA, this is the 95% confidence interval. For LSTM, the band is derived from GARCH volatility predictions.</p>
+              </section>
+              <section>
+                <h3 className="text-white font-semibold mb-2">Model Metrics (KPIs)</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li><span className="text-white">MAE:</span> Mean Absolute Error (lower is better)</li>
+                  <li><span className="text-white">RMSE:</span> Root Mean Square Error (penalizes large outliers)</li>
+                  <li><span className="text-white">MAPE:</span> Mean Absolute Percentage Error (percentage-based accuracy)</li>
+                  <li><span className="text-white">GARCH Persistence:</span> How long volatility shocks last (closer to 1 = long-lasting)</li>
+                </ul>
+              </section>
+            </div>
+            <div className="mt-8 pt-6 border-t border-white/5 flex justify-end">
+              <button 
+                onClick={() => setShowHelpModal(false)}
+                className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-6 rounded-lg transition-colors"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SHARE/EXPORT MODAL */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowShareModal(false)} />
+          <div className="relative bg-zinc-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setShowShareModal(false)}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-3">
+              <Share className="text-cyan-400" /> Share & Export
+            </h2>
+            <div className="space-y-6">
+              <div>
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Share Link</label>
+                <div className="flex gap-2">
+                  <div className="flex-grow bg-zinc-800 border border-white/5 rounded-lg px-3 py-2 text-zinc-300 text-xs truncate">
+                    {typeof window !== 'undefined' ? window.location.href : 'Loading...'}
+                  </div>
+                  <button 
+                    onClick={handleCopyLink}
+                    className="bg-white/5 hover:bg-white/10 border border-white/10 p-2 rounded-lg transition-colors group relative"
+                  >
+                    {copySuccess ? <Check size={18} className="text-green-500" /> : <Copy size={18} className="text-zinc-400" />}
+                    {copySuccess && (
+                      <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-green-500 text-black text-[10px] px-2 py-1 rounded whitespace-nowrap">
+                        Copied!
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-white/5">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 block">Data Export</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={() => exportToCSV(arimaChartData, 'arima_forecast')}
+                    className="flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-white/5 p-3 rounded-xl transition-colors text-xs text-white"
+                  >
+                    <Download size={16} className="text-cyan-400" /> ARIMA CSV
+                  </button>
+                  <button 
+                    onClick={() => exportToCSV(lstmChartData, 'lstm_forecast')}
+                    className="flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 border border-white/5 p-3 rounded-xl transition-colors text-xs text-white"
+                  >
+                    <Download size={16} className="text-green-400" /> LSTM CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

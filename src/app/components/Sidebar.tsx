@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, ChevronLeft, Database } from 'lucide-react';
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -126,6 +126,15 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
                 label: 'Dashboard',
                 href: '/system/Dashboard',
                 icon: LayoutDashboard
+              }}
+              collapsed={isCollapsed}
+            />
+            <NavLink
+              item={{
+                label: 'Data Explorer',
+                href: '/system/data-explorer',
+                icon: Database,
+                description: 'Browse raw data'
               }}
               collapsed={isCollapsed}
             />
