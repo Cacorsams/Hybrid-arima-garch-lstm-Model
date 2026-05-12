@@ -150,16 +150,16 @@ export default function DataExplorerPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/system/Dashboard"
-            className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+            className="flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10 transition-all"
           >
             <ArrowLeft size={16} />
           </Link>
           <div>
             <h1 className="text-xl font-semibold text-foreground tracking-tight flex items-center gap-2">
-              <Database size={20} className="text-zinc-500" />
+              <Database size={20} className="text-zinc-400 dark:text-zinc-500" />
               Data Explorer
             </h1>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               {totalRows.toLocaleString()} records across {TABLE_CONFIG.length} tables
             </p>
           </div>
@@ -173,7 +173,7 @@ export default function DataExplorerPage() {
             placeholder="Search records…"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 focus:border-cyan-500/30 transition-all"
+            className="w-full pl-9 pr-3 py-2 bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-lg text-xs text-zinc-900 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 focus:border-cyan-500/30 transition-all"
           />
         </div>
       </header>
@@ -190,8 +190,8 @@ export default function DataExplorerPage() {
               className={`
                 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-200
                 ${isActive
-                  ? 'bg-white/10 border border-white/15 text-white shadow-lg'
-                  : 'bg-transparent border border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                  ? 'bg-zinc-200 dark:bg-white/10 border border-zinc-300 dark:border-white/15 text-zinc-900 dark:text-white shadow-sm dark:shadow-lg'
+                  : 'bg-transparent border border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5'
                 }
               `}
             >
@@ -211,10 +211,10 @@ export default function DataExplorerPage() {
             <div className="w-1 h-5 rounded-full" style={{ backgroundColor: activeConfig.color }} />
             <div>
               <h2 className="text-sm font-semibold text-foreground">{activeConfig.label}</h2>
-              <p className="text-[10px] text-zinc-500">{activeConfig.description}</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{activeConfig.description}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-[10px] text-zinc-500 font-mono">
+          <div className="flex items-center gap-4 text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
             <span>{totalRows.toLocaleString()} rows</span>
             <span>{activeConfig.columns.length} cols</span>
             <span>Page {page}/{totalPages}</span>
@@ -229,7 +229,7 @@ export default function DataExplorerPage() {
                 {activeConfig.columns.map((col) => (
                   <th
                     key={col}
-                    className="px-4 py-3 text-[10px] font-bold text-zinc-500 uppercase tracking-widest whitespace-nowrap bg-white/[0.02]"
+                    className="px-4 py-3 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest whitespace-nowrap bg-zinc-50/50 dark:bg-white/[0.02]"
                   >
                     {formatColumnHeader(col)}
                   </th>
@@ -241,15 +241,15 @@ export default function DataExplorerPage() {
                 <tr>
                   <td colSpan={activeConfig.columns.length} className="text-center py-20">
                     <div className="flex flex-col items-center gap-3">
-                      <Loader2 size={24} className="animate-spin text-zinc-500" />
-                      <span className="text-xs text-zinc-500 tracking-widest uppercase">Loading data…</span>
+                      <Loader2 size={24} className="animate-spin text-zinc-400 dark:text-zinc-500" />
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400 tracking-widest uppercase">Loading data…</span>
                     </div>
                   </td>
                 </tr>
               ) : data.length === 0 ? (
                 <tr>
                   <td colSpan={activeConfig.columns.length} className="text-center py-20">
-                    <span className="text-xs text-zinc-600">No records found</span>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-600">No records found</span>
                   </td>
                 </tr>
               ) : (
@@ -262,7 +262,7 @@ export default function DataExplorerPage() {
                       <td
                         key={col}
                         className={`px-4 py-2.5 text-[11px] whitespace-nowrap font-mono ${
-                          col === 'id' ? 'text-zinc-600' : 'text-zinc-300'
+                          col === 'id' ? 'text-zinc-500 dark:text-zinc-500' : 'text-zinc-900 dark:text-zinc-300'
                         }`}
                       >
                         {formatCell(row[col], col)}
@@ -277,21 +277,21 @@ export default function DataExplorerPage() {
 
         {/* Pagination */}
         <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-          <p className="text-[10px] text-zinc-500 font-mono">
+          <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
             Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, totalRows)} of {totalRows.toLocaleString()}
           </p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(1)}
               disabled={page === 1}
-              className="p-1.5 rounded-md text-zinc-500 hover:text-white hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronsLeft size={14} />
             </button>
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-md text-zinc-500 hover:text-white hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft size={14} />
             </button>
@@ -316,8 +316,8 @@ export default function DataExplorerPage() {
                     className={`
                       w-7 h-7 rounded-md text-[10px] font-medium transition-all
                       ${pageNum === page
-                        ? 'bg-white/10 text-white border border-white/10'
-                        : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                        ? 'bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-white border border-zinc-300 dark:border-white/10'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5'
                       }
                     `}
                   >
@@ -330,14 +330,14 @@ export default function DataExplorerPage() {
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-md text-zinc-500 hover:text-white hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight size={14} />
             </button>
             <button
               onClick={() => setPage(totalPages)}
               disabled={page === totalPages}
-              className="p-1.5 rounded-md text-zinc-500 hover:text-white hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-md text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronsRight size={14} />
             </button>
