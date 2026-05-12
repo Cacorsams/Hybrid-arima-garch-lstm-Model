@@ -9,13 +9,21 @@ from dotenv import load_dotenv
 import os
 from supabase import create_client, Client
 
-load_dotenv(dotenv_path='../.env.local')
+load_dotenv() # Load from .env if it exists
+# Fallback to .env.local for local development if not in Docker
+if not os.getenv("SUPABASE_URL") and not os.getenv("NEXT_PUBLIC_SUPABASE_URL"):
+    load_dotenv(dotenv_path='../.env.local')
 
-SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL") or os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHAVANTAGE_API_KEY")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+if not SUPABASE_URL:
+    print("❌ Critical Error: SUPABASE_URL is missing from environment variables.")
+if not SUPABASE_KEY:
+    print("❌ Critical Error: SUPABASE_KEY is missing from environment variables.")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
 
 class ForexDataCollector:
     """Collect and preprocess FX and macro data"""
