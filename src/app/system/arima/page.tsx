@@ -271,10 +271,10 @@ export default function ArimaPage() {
                                         <h3 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Configuration</h3>
                                         <dl className="space-y-2.5">
                                             {[
-                                                { label: 'Order (p,d,q)', val: metrics.order ? `(${metrics.order.join(', ')})` : '—' },
+                                                { label: 'Order (p,d,q)', val: '(1, 0, 1)' },
                                                 { label: 'AIC', val: metrics.aic?.toFixed(2) ?? '—' },
                                                 { label: 'BIC', val: metrics.bic?.toFixed(2) ?? '—' },
-                                                { label: 'Test Window', val: `${metrics.test_size} days` },
+                                                { label: 'Test Window', val: '517 days' },
                                             ].map((item, i) => (
                                                 <div key={i} className="flex justify-between border-b border-border pb-2.5">
                                                     <dt className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</dt>

@@ -41,17 +41,7 @@ const teamMembers = [
 ]
 
 export default function ProjectPage() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % (teamMembers.length - 3));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + (teamMembers.length - 3)) % (teamMembers.length - 3));
-  };
-
   return (
     <div
       className="min-h-screen w-full bg-[#f5f0eb] dark:bg-[#121212] transition-colors duration-200"
@@ -188,7 +178,7 @@ export default function ProjectPage() {
                 fontFamily: "'DM Serif Display', serif",
               }}
             >
-              A HYBRID GARCH-LSTM-ARIMA MODEL <br className="hidden md:block" /> FOR CURRENCY EXCHANGE RATE FORECASTING
+              A Comparative Analysis of GARCH, LSTM, and ARIMA Models for Currency Exchange Rate Forecasting Against Hybrid Models
             </h1>
             <p className="text-[#555] dark:text-gray-400 text-base md:text-lg leading-relaxed max-w-4xl">
               A RESEARCH PROPOSAL SUBMITTED TO THE FACULTY OF SCIENCE AND TECHNOLOGY IN PARTIAL FULFILLMENT OF THE REQUIREMENT FOR THE AWARD OF A BACHELOR’S DEGREE IN MATHEMATICS AND COMPUTER SCIENCE, MULTIMEDIA UNIVERSITY OF KENYA (2026)
@@ -246,81 +236,20 @@ export default function ProjectPage() {
               Research Team
             </h2>
           </div>
-
-          {/* Slider Controls */}
-          <div className="flex gap-4">
-            <button
-              onClick={prevSlide}
-              className="w-12 h-12 rounded-full border border-[#e0dbd5] dark:border-gray-800 flex items-center justify-center text-[#1a1a1a] dark:text-white hover:bg-[#1a1a1a] dark:hover:bg-white hover:text-white dark:hover:text-black transition-all duration-300"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="w-12 h-12 rounded-full border border-[#e0dbd5] dark:border-gray-800 flex items-center justify-center text-[#1a1a1a] dark:text-white hover:bg-[#1a1a1a] dark:hover:bg-white hover:text-white dark:hover:text-black transition-all duration-300"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          </div>
         </div>
 
-        {/* Slider Track Wrapper with Negative Margins to offset padding */}
-        <div className="-mx-3 md:-mx-4">
-          {/* Slider Track */}
-          <div
-            className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
-            style={{
-              transform: `translateX(-${currentIndex * (100 / teamMembers.length)}%)`,
-              width: `${(teamMembers.length / 4) * 100}%`
-            }}
-          >
-            {teamMembers.map((member, idx) => {
-              return (
-                <div
-                  key={idx}
-                  className="flex-shrink-0 px-3 md:px-4"
-                  style={{ width: `${100 / teamMembers.length}%` }}
-                >
-                  <div className="w-full h-full group relative block overflow-hidden rounded-xl aspect-[3/4] bg-[#e8e3dd] cursor-pointer">
-                {/* Background Graphics (Preserving Velisse Brand) */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 z-10" />
-
-                {/* Image Layer */}
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-
-
-
-                {/* Name Label */}
-                <div className="absolute top-5 left-5 z-20">
-                  <span className="text-white text-sm md:text-base font-medium bg-black/30 backdrop-blur-sm px-3 py-1 rounded">
-                    {member.name}
-                  </span>
-                </div>
-
-                {/* Hover Bio Reveal Overlay */}
-                <div className="absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-all duration-500 bg-[#f5f0eb]/95 dark:bg-[#1e1e1e]/95 backdrop-blur-md flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 text-[#1a1a1a] dark:text-white">
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'DM Serif Display', serif" }}>
-                    {member.name}
-                  </h3>
-                  <p className="text-sm leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 text-[#555] dark:text-gray-400">
-                    {member.bio}
-                  </p>
-                  <div className="w-8 h-1 bg-[#1a1a1a] dark:bg-white rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 delay-300" />
-                </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ul className="flex flex-col gap-4 max-w-4xl">
+          {teamMembers.map((member, idx) => (
+            <li
+              key={idx}
+              className="text-[#1a1a1a] dark:text-white text-lg md:text-xl font-medium flex items-center gap-3"
+              style={{ fontFamily: "'DM Serif Display', serif" }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] dark:bg-white inline-block" />
+              {member.name}
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Footer */}

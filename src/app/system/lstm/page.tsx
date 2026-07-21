@@ -235,11 +235,11 @@ export default function LstmPage() {
                         <div className="bg-zinc-900 dark:bg-zinc-800 rounded-xl p-6 text-zinc-100 border border-zinc-700 h-full flex flex-col justify-center">
                             <h2 className="text-lg font-semibold mb-3">Standalone LSTM</h2>
                             <p className="text-zinc-300 dark:text-zinc-400 text-sm leading-relaxed mb-4">
-                                This Long Short-Term Memory network uses a 30-day lookback window across multiple hidden layers with dropout regularization.
+                                This Long Short-Term Memory network uses a 21-day lookback window across multiple hidden layers with dropout regularization.
                             </p>
                             <p className="text-zinc-300 dark:text-zinc-400 text-sm leading-relaxed mb-4">
                                 Unlike ARIMA which fits a linear equation, the neural network learns complex non-linear patterns.
-                                The iterative forecast predicts T+1, appends it to the sequence, and continues to predict up to T+30.
+                                The iterative forecast predicts T+1, appends it to the sequence, and continues to predict up to T+21.
                             </p>
                             <div className="mt-auto pt-4 border-t border-zinc-700/50">
                                 <p className="text-zinc-500 dark:text-zinc-500 text-xs leading-relaxed">
